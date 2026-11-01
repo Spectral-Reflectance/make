@@ -4,6 +4,7 @@ import { OrbitControls, useProgress } from '@react-three/drei';
 import { DoubleSide, MeshStandardMaterial, OrthographicCamera, type Mesh } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { assetStem, assetUrl, type ColorId, type Palette } from './data';
+import type { Theme } from './theme';
 
 function Model({ url, palette, meshColorIds }: { url: string; palette: Palette; meshColorIds: ColorId[] }) {
   const gltf = useLoader(GLTFLoader, url);
@@ -77,12 +78,13 @@ function FitCamera({ onPlate }: { onPlate: boolean }) {
   return null;
 }
 
-export function ModelPreview({ designId, paletteId, palette, meshColorIds, onPlate }: {
+export function ModelPreview({ designId, paletteId, palette, meshColorIds, onPlate, theme }: {
   designId: string;
   paletteId: string;
   palette: Palette;
   meshColorIds: ColorId[];
   onPlate: boolean;
+  theme: Theme;
 }) {
   const url = assetUrl(`${assetStem(designId, paletteId)}.glb`);
   const { active } = useProgress();
@@ -96,13 +98,13 @@ export function ModelPreview({ designId, paletteId, palette, meshColorIds, onPla
     <div className="model-preview" ref={containerRef} aria-label={onPlate ? '3D tag resting face up on a generic print plate grid' : 'Interactive 3D model preview'}>
       <Canvas key={`${onPlate ? 'plate' : 'model'}-${viewVersion}`} orthographic camera={{ position: onPlate ? [75, -95, 120] : [76, -108, 145], up: onPlate ? [0, 0, 1] : [0, 1, 0], zoom: onPlate ? 1.8 : 2.1, near: 0.1, far: 1000 }} gl={{ antialias: true }}>
         <FitCamera onPlate={onPlate} />
-        <color attach="background" args={['#f5f3f0']} />
+        <color attach="background" args={[theme === 'dark' ? '#16202c' : '#f5f3f0']} />
         <ambientLight intensity={1.9} />
         <directionalLight position={[30, 20, 100]} intensity={2.6} />
         <directionalLight position={[-40, -50, 50]} intensity={1.2} />
         {onPlate && <>
-          <mesh position={[0, 0, -0.12]} receiveShadow><planeGeometry args={[180, 180]} /><meshStandardMaterial color="#e1e5e8" roughness={1} /></mesh>
-          <gridHelper args={[180, 18, '#8797a5', '#c5cdd3']} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.1]} />
+          <mesh position={[0, 0, -0.12]} receiveShadow><planeGeometry args={[180, 180]} /><meshStandardMaterial color={theme === 'dark' ? '#263344' : '#e1e5e8'} roughness={1} /></mesh>
+          <gridHelper args={[180, 18, theme === 'dark' ? '#718098' : '#8797a5', theme === 'dark' ? '#405063' : '#c5cdd3']} rotation={[Math.PI / 2, 0, 0]} position={[0, 0, -0.1]} />
         </>}
         <Suspense fallback={null}><Model key={url} url={url} palette={palette} meshColorIds={meshColorIds} /></Suspense>
         <OrbitControls target={[0, 0, 1]} enablePan={false} minDistance={80} maxDistance={350} />

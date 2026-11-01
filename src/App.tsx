@@ -1,6 +1,8 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { FacePreview } from './FacePreview';
 import { ManualColourSelector } from './ManualColourSelector';
+import { ThemeToggle } from './ThemeToggle';
+import { applyTheme, currentTheme, type Theme } from './theme';
 import { filamentBrands, matchFilaments, paletteForFilaments, type Filament, type FilamentTriplet, type FilamentBrand, type FilamentRange } from './filamentPicker';
 import { assetStem, assetUrl, customTriplet, paletteEntries, withTripletColor, type Catalog, type DesignInfo, type Palette, type TripletSlot } from './data';
 
@@ -50,7 +52,7 @@ function DesignChoice({ design, selected, palette, onSelect }: { design: DesignI
   );
 }
 
-function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId: string; setDesignId: (id: string) => void }) {
+function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; designId: string; setDesignId: (id: string) => void; theme: Theme }) {
   const initialDesign = catalog.designs.find(({ id }) => id === designId) ?? catalog.designs[0];
   const [paletteId, setPaletteId] = useState(initialDesign.paletteIds[0]);
   const [customMode, setCustomMode] = useState<'any' | 'filament'>('any');
@@ -178,7 +180,7 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
             <button type="button" role="tab" aria-selected={view === 'plate'} className={view === 'plate' ? 'active' : ''} onClick={() => setView('plate')}>On plate</button>
             <button type="button" role="tab" aria-selected={view === '2d'} className={view === '2d' ? 'active' : ''} onClick={() => setView('2d')}>2D view</button>
           </div>
-          <div className="preview-window" role="tabpanel">{view !== '2d' ? <PreviewErrorBoundary key={design.id}><Suspense fallback={<div className="preview-loading" role="status">Loading 3D viewer…</div>}><ModelPreview designId={design.id} paletteId={design.templatePaletteId} palette={palette} meshColorIds={design.meshColorIds} onPlate={view === 'plate'} /></Suspense></PreviewErrorBoundary> : <div className="flat-preview">
+          <div className="preview-window" role="tabpanel">{view !== '2d' ? <PreviewErrorBoundary key={design.id}><Suspense fallback={<div className="preview-loading" role="status">Loading 3D viewer…</div>}><ModelPreview designId={design.id} paletteId={design.templatePaletteId} palette={palette} meshColorIds={design.meshColorIds} onPlate={view === 'plate'} theme={theme} /></Suspense></PreviewErrorBoundary> : <div className="flat-preview">
             <div className="face-side-switch" role="group" aria-label="2D view side"><button type="button" className={faceSide === 'front' ? 'is-selected' : ''} aria-pressed={faceSide === 'front'} onClick={() => setFaceSide('front')}>Front</button><button type="button" className={faceSide === 'back' ? 'is-selected' : ''} aria-pressed={faceSide === 'back'} onClick={() => setFaceSide('back')}>Back</button></div>
             <FacePreview designId={design.id} paletteId={isCustom ? design.templatePaletteId : selectedPaletteId} palette={palette} side={faceSide} />
           </div>}</div>
@@ -235,6 +237,7 @@ function SupportCard() {
 }
 
 export function App() {
+  const [theme, setTheme] = useState<Theme>(currentTheme);
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [designId, setDesignId] = useState(() => new URLSearchParams(window.location.search).get('design') === 'stac' ? 'stac' : 'trust-the-agent');
@@ -244,6 +247,11 @@ export function App() {
     url.searchParams.set('design', id);
     window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
   };
+  const toggleTheme = () => {
+    const next = theme === 'light' ? 'dark' : 'light';
+    applyTheme(next);
+    setTheme(next);
+  };
   useEffect(() => {
     fetch(assetUrl('catalog.json'))
       .then((response) => { if (!response.ok) throw new Error('Design catalogue unavailable.'); return response.json() as Promise<Catalog>; })
@@ -252,8 +260,8 @@ export function App() {
   }, []);
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
-    <header className="site-header"><div className="header-inner"><a className="brand" href="#top" aria-label="Spectral Reflectance make, home"><strong>Spectral Reflectance</strong><span className="brand-divider" aria-hidden="true">//</span><span className="brand-make">make</span></a><nav aria-label="Main navigation"><a href="#about">About</a><a href="https://www.spectralreflectance.space/" target="_blank" rel="noopener noreferrer" aria-label="Spectral Reflectance (opens in a new tab)">Spectral Reflectance <span aria-hidden="true">↗</span></a></nav></div></header>
-    <main id="main"><div id="top" />{error && <div className="load-error" role="alert">{error}</div>}{!catalog && !error && <div className="initial-loading" role="status">Loading the collection…</div>}{catalog && <><Hero /><div className="content-wrap"><Maker catalog={catalog} designId={designId} setDesignId={selectDesign} /><PrintedExamples /></div></>}
+    <header className="site-header"><div className="header-inner"><a className="brand" href="#top" aria-label="Spectral Reflectance make, home"><strong>Spectral Reflectance</strong><span className="brand-divider" aria-hidden="true">//</span><span className="brand-make">make</span></a><nav aria-label="Main navigation"><a href="#about">About</a><a href="https://www.spectralreflectance.space/" target="_blank" rel="noopener noreferrer" aria-label="Spectral Reflectance (opens in a new tab)">Spectral Reflectance <span aria-hidden="true">↗</span></a></nav><ThemeToggle theme={theme} onToggle={toggleTheme} /></div></header>
+    <main id="main"><div id="top" />{error && <div className="load-error" role="alert">{error}</div>}{!catalog && !error && <div className="initial-loading" role="status">Loading the collection…</div>}{catalog && <><Hero /><div className="content-wrap"><Maker catalog={catalog} designId={designId} setDesignId={selectDesign} theme={theme} /><PrintedExamples /></div></>}
       <section className="about-section" id="about" aria-labelledby="about-title"><div className="about-inner">
         <article className="about-card">
           <h2 id="about-title">About Spectral Reflectance <code className="about-mark">// make</code></h2>
