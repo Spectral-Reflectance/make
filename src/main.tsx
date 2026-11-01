@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import '@fontsource-variable/inter/wght.css';
 import '@fontsource-variable/space-grotesk/wght.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/dancing-script/latin-500.css';
 import { App } from './App';
 import './styles.css';
 

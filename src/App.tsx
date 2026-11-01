@@ -228,10 +228,13 @@ function PrintedExamples() {
 
 function SupportCard() {
   return <div className="support-wrap"><section className="support-card" aria-labelledby="support-title">
-    <h2 className="support-heading" id="support-title"><img src={`${import.meta.env.BASE_URL}landsat-latte.webp`} alt="Buy me a Landsat Latte" width="848" height="205" loading="lazy" decoding="async" /></h2>
-    <div className="support-copy">
-      <p>Enjoyed the designs? If you’d like to support this little maker project, you can buy me a coffee.</p>
-      <a className="button button-primary support-button" href="https://buymeacoffee.com/xen0f0n" target="_blank" rel="noopener noreferrer" aria-label="Buy me a coffee (opens in a new tab)">Buy me a coffee <span aria-hidden="true">↗</span></a>
+    <img className="support-art" src={`${import.meta.env.BASE_URL}landsat-latte-cup.png`} alt="Illustrated cup of coffee with a satellite in the latte art" width="640" height="427" loading="lazy" decoding="async" />
+    <div className="support-content">
+      <h2 className="support-heading" id="support-title">Buy me a Landsat Latte</h2>
+      <div className="support-copy">
+        <p>Enjoyed the designs? If you’d like to support this little maker project, you can buy me a coffee.</p>
+        <a className="button button-primary support-button" href="https://buymeacoffee.com/xen0f0n" target="_blank" rel="noopener noreferrer" aria-label="Buy me a coffee (opens in a new tab)">Buy me a coffee <span aria-hidden="true">↗</span></a>
+      </div>
     </div>
   </section></div>;
 }

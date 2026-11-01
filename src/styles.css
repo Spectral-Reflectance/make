@@ -789,24 +789,32 @@ h1,h2,h3 {
   padding:0 var(--page-gutter)
 }
 .support-card {
-  min-height:255px;
-  overflow:hidden;
-  padding:10px 28px 25px;
+  display:grid;
+  grid-template-columns:clamp(170px,19vw,235px) minmax(0,1fr);
+  align-items:center;
+  gap:clamp(20px,3vw,42px);
+  padding:24px 36px;
   border:1px solid #e7e3dd;
   border-radius:10px;
   background:#fffdfa
 }
-.about-section .support-heading {margin:0;line-height:0}
-.support-heading img {
+.support-art {
   display:block;
-  width:min(800px,100%);
+  width:100%;
   height:auto;
-  mix-blend-mode:multiply
+}
+.support-content {min-width:0}
+.about-section .support-heading {
+  margin:0 0 10px;
+  color:#0d1d3b;
+  font-family:'Dancing Script',cursive;
+  font-size:clamp(37px,4.2vw,58px);
+  font-weight:500;
+  line-height:1.12
 }
 .support-copy {
-  position:relative;
   max-width:650px;
-  margin:-55px 0 0 min(27.6%,221px)
+  margin:0
 }
 .about-section .support-copy p {
   max-width:610px;
@@ -924,9 +932,9 @@ h1,h2,h3 {
   .about-inner {grid-template-columns:1fr;gap:16px}
 }
 @media(max-width:650px) {
-  .support-card {min-height:0;padding:14px 20px 22px}
-  .support-heading img {width:100%;max-width:540px}
-  .support-copy {margin:10px 0 0}
+  .support-card {grid-template-columns:1fr;gap:4px;padding:18px 22px 24px;text-align:center}
+  .support-art {width:min(180px,55%);margin:auto}
+  .support-copy {margin:auto}
 }
 @media(max-width:720px) {
   .maker-grid {grid-template-columns:1fr}
@@ -1058,8 +1066,7 @@ h1,h2,h3 {
 [data-theme=dark] .about-section .support-button {color:#fff}
 [data-theme=dark] .licence-card strong,[data-theme=dark] .legal-article strong {color:#EAF0F7}
 [data-theme=dark] .legal-article a strong {color:#D45A72}
-[data-theme=dark] .support-heading img {mix-blend-mode:normal;background:#fff;border-radius:7px}
-[data-theme=dark] .support-copy {margin:15px 0 0}
+[data-theme=dark] .about-section .support-heading {color:#EAF0F7}
 [data-theme=dark] .legal-page {background:#101722}
 [data-theme=dark] .site-footer {border-top:1px solid #263344;color:#A6B3C5}
 [data-theme=dark] .site-footer a {color:#D45A72}
