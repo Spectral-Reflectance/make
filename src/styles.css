@@ -845,43 +845,6 @@ h1,h2,h3 {
 .legal-article li+li {
   margin-top:6px
 }
-.design-page .legal-article {
-  max-width:980px
-}
-.design-page-hero {
-  display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(260px,38%);
-  gap:36px;
-  align-items:center
-}
-.design-page-hero figure {
-  margin:0
-}
-.design-page-hero img {
-  display:block;
-  width:100%;
-  height:auto;
-  aspect-ratio:3/4;
-  object-fit:cover;
-  object-position:center 68%;
-  border-radius:9px
-}
-.design-page-hero .design-photo-stac {
-  object-position:80% center
-}
-.design-page-hero figcaption {
-  color:#747e8d;
-  font-size:12px;
-  line-height:1.5;
-  margin-top:8px
-}
-.design-page .design-customise {
-  color:#fff;
-  margin-top:24px
-}
-.design-download-list a {
-  font-weight:650
-}
 .site-footer {
   max-width:var(--page-width);
   margin:auto;
@@ -935,8 +898,6 @@ h1,h2,h3 {
   .support-card {min-height:0;padding:14px 20px 22px}
   .support-heading img {width:100%;max-width:540px}
   .support-copy {margin:10px 0 0}
-  .design-page-hero {grid-template-columns:1fr;gap:25px}
-  .design-page-hero figure {max-width:390px}
 }
 @media(max-width:720px) {
   .maker-grid {grid-template-columns:1fr}

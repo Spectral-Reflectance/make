@@ -3,10 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 const site = 'https://www.make.spectralreflectance.space';
 const root = new URL('../', import.meta.url);
-const routes = new Map([
+const pages = new Map([
   ['/', 'index.html'],
-  ['/designs/trust-the-agent/', 'designs/trust-the-agent/index.html'],
-  ['/designs/stac-or-it-doesnt-exist/', 'designs/stac-or-it-doesnt-exist/index.html'],
   ['/licence/', 'licence/index.html'],
 ]);
 
@@ -14,12 +12,12 @@ const read = (path) => readFileSync(new URL(path, root), 'utf8');
 const jsonLd = (html) => [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(([, contents]) => JSON.parse(contents));
 
 describe('static discovery files', () => {
-  it('links every canonical, readable HTML page from the sitemap and llms.txt', () => {
+  it('lists only the homepage and licence as canonical HTML pages', () => {
     const sitemap = read('public/sitemap.xml');
     const llms = read('public/llms.txt');
     const robots = read('public/robots.txt');
     expect(robots).toContain(`Sitemap: ${site}/sitemap.xml`);
-    for (const [route, path] of routes) {
+    for (const [route, path] of pages) {
       const html = read(path);
       expect(html).toContain(`<link rel="canonical" href="${site}${route}" />`);
       expect(html).toMatch(/<h1[\s>]/);
@@ -27,26 +25,40 @@ describe('static discovery files', () => {
       expect(llms).toContain(`${site}${route}`);
       expect(html).toContain('href="/llms.txt"');
     }
-    expect(read('index.html')).toContain('href="/designs/stac-or-it-doesnt-exist/"');
-    expect(read('index.html')).toContain('href="/designs/trust-the-agent/"');
+    for (const design of ['trust-the-agent', 'stac-or-it-doesnt-exist']) {
+      expect(existsSync(new URL(`designs/${design}/index.html`, root))).toBe(false);
+      expect(sitemap).not.toContain(`/designs/${design}/`);
+      expect(llms).not.toContain(`/designs/${design}/`);
+      expect(read('index.html')).not.toContain(`/designs/${design}/`);
+    }
+    expect(read('index.html')).toContain('href="/?design=trust-the-agent#maker"');
+    expect(read('index.html')).toContain('href="/?design=stac#maker"');
   });
 
-  it('describes the browser tool and real downloadable model files', () => {
-    const [home] = jsonLd(read('index.html'));
-    expect(home['@graph'].map(({ '@type': type }) => type)).toEqual(['WebSite', 'SoftwareApplication']);
-    for (const [, path] of [...routes].filter(([route]) => route.startsWith('/designs/'))) {
-      const html = read(path);
-      const [model] = jsonLd(html);
-      expect(model['@type']).toBe('3DModel');
+  it('describes the browser tool and both models on the homepage', () => {
+    const home = read('index.html');
+    const [metadata] = jsonLd(home);
+    const graph = metadata['@graph'];
+    expect(graph.map(({ '@type': type }) => type)).toEqual(['WebSite', 'SoftwareApplication', '3DModel', '3DModel']);
+    const catalog = JSON.parse(read('public/assets/catalog.json'));
+    for (const design of catalog.designs) {
+      const model = graph.find((node) => node['@id'] === `${site}/#${design.id}-model`);
+      expect(model).toBeTruthy();
       expect(model.license).toBe(`${site}/licence/`);
-      expect(model.encoding.map(({ encodingFormat }) => encodingFormat)).toContain('model/3mf');
-      expect(model.encoding.map(({ encodingFormat }) => encodingFormat)).toContain('model/stl');
-      for (const file of model.encoding) {
-        const url = new URL(file.contentUrl);
-        expect(url.origin).toBe(site);
-        expect(existsSync(new URL(`public${url.pathname}`, root))).toBe(true);
-        expect(html).toContain(`href="${url.pathname}"`);
+      expect(model.url).toBe(`${site}/?design=${design.id}#maker`);
+      const urls = model.encoding.map(({ contentUrl }) => contentUrl);
+      expect(urls).toEqual([
+        ...design.paletteIds.map((paletteId) => `${site}/assets/${design.id}-${paletteId}.3mf`),
+        `${site}/assets/${design.id}.stl`,
+      ]);
+      expect(model.encoding.map(({ encodingFormat }) => encodingFormat))
+        .toEqual([...design.paletteIds.map(() => 'model/3mf'), 'model/stl']);
+      for (const url of urls) {
+        const path = new URL(url).pathname;
+        expect(existsSync(new URL(`public${path}`, root))).toBe(true);
       }
+      expect(home).toContain(`href="/assets/${design.id}-${design.paletteIds[0]}.3mf"`);
+      expect(home).toContain(`href="/assets/${design.id}.stl"`);
     }
   });
 });

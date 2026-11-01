@@ -26,8 +26,6 @@ export default defineConfig({
       input: {
         main: decodeURIComponent(new URL('./index.html', import.meta.url).pathname),
         licence: decodeURIComponent(new URL('./licence/index.html', import.meta.url).pathname),
-        trustTheAgent: decodeURIComponent(new URL('./designs/trust-the-agent/index.html', import.meta.url).pathname),
-        stac: decodeURIComponent(new URL('./designs/stac-or-it-doesnt-exist/index.html', import.meta.url).pathname),
       },
     },
   },
