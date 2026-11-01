@@ -157,8 +157,8 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
           </button>
           <dialog className="print-dialog" id="print-info" ref={printDialogRef} aria-labelledby="print-dialog-title">
             <h3 id="print-dialog-title">Before printing</h3>
-            <p>The 3MF contains separate colour-intent solids. Open and slice it in Bambu Studio, then map the colours to your filaments.</p>
-            <p>Check the through-hole, raised artwork and dimensions in the sliced layers. STL contains a single-colour solid.</p>
+            <p>The 3MF includes separate parts for each colour. Open it in Bambu Studio, assign your filaments, and slice the model.</p>
+            <p>The STL version doesn't include colour information.</p>
             <form method="dialog"><button className="button button-primary" type="submit">Close</button></form>
           </dialog>
           <div className="print-details"><h4>Details</h4><dl><div><dt>Size</dt><dd>60 × 100 × 2 mm</dd></div>{palette.filaments && <div><dt>Bambu PLA Basic colours</dt><dd className="filament-list">{palette.filaments.map((filament) => <span key={filament.name}><i aria-hidden="true" style={{ background: filament.hex }} />{filament.name}</span>)}</dd></div>}</dl></div>
