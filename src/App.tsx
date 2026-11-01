@@ -171,15 +171,15 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
 function PrintedExamples() {
   const examples = [
     { title: 'Tags and holders', image: `${import.meta.env.BASE_URL}hero-image.png`, alt: 'Printed Trust the Agent and STAC tags with their holders on a wooden table' },
-    { title: 'Trust the Agent', image: `${import.meta.env.BASE_URL}trust-the-agent-bag-tag.jpg`, alt: 'Printed Trust the Agent bag tag hanging from a black backpack', position: 'center 66%' },
-    { title: 'STAC or it doesn’t exist', image: null, alt: '' },
+    { title: 'Trust the Agent', image: `${import.meta.env.BASE_URL}trust-the-agent-bag-tag.jpg`, alt: 'Printed Trust the Agent bag tag hanging from a black backpack', position: 'center 66%', href: '/designs/trust-the-agent/' },
+    { title: 'STAC or it doesn’t exist', image: null, alt: '', href: '/designs/stac-or-it-doesnt-exist/' },
     { title: 'Your print here', image: null, alt: '' },
   ];
   return <section className="examples-section" id="examples" aria-labelledby="examples-title">
     <div className="section-heading"><div><h2 id="examples-title">Printed examples</h2><p>More photos are coming. If you print a tag, send us a pic!</p></div></div>
     <div className="examples-grid">{examples.map((example) => <figure className={`example-card ${example.image ? 'has-photo' : 'is-placeholder'}`} key={example.title}>
       {example.image ? <img src={example.image} alt={example.alt} loading="lazy" style={{ objectPosition: example.position ?? 'center' }} /> : <div className="example-placeholder" aria-label="Photo coming soon"><span>Photo coming soon</span></div>}
-      <figcaption>{example.title}</figcaption>
+      <figcaption>{example.href ? <a href={example.href}>{example.title}</a> : example.title}</figcaption>
     </figure>)}</div>
   </section>;
 }
@@ -197,7 +197,13 @@ function SupportCard() {
 export function App() {
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [designId, setDesignId] = useState('trust-the-agent');
+  const [designId, setDesignId] = useState(() => new URLSearchParams(window.location.search).get('design') === 'stac' ? 'stac' : 'trust-the-agent');
+  const selectDesign = (id: string) => {
+    setDesignId(id);
+    const url = new URL(window.location.href);
+    url.searchParams.set('design', id);
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`);
+  };
   useEffect(() => {
     fetch(assetUrl('catalog.json'))
       .then((response) => { if (!response.ok) throw new Error('Design catalogue unavailable.'); return response.json() as Promise<Catalog>; })
@@ -207,7 +213,7 @@ export function App() {
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <header className="site-header"><div className="header-inner"><a className="brand" href="#top" aria-label="Spectral Reflectance make, home"><strong>Spectral Reflectance</strong><span className="brand-divider" aria-hidden="true">//</span><span className="brand-make">make</span></a><nav aria-label="Main navigation"><a href="#about">About</a><a href="https://www.spectralreflectance.space/" target="_blank" rel="noopener noreferrer" aria-label="Spectral Reflectance (opens in a new tab)">Spectral Reflectance <span aria-hidden="true">↗</span></a></nav></div></header>
-    <main id="main"><div id="top" />{error && <div className="load-error" role="alert">{error}</div>}{!catalog && !error && <div className="initial-loading" role="status">Loading the collection…</div>}{catalog && <><Hero /><div className="content-wrap"><Maker catalog={catalog} designId={designId} setDesignId={setDesignId} /><PrintedExamples /></div></>}
+    <main id="main"><div id="top" />{error && <div className="load-error" role="alert">{error}</div>}{!catalog && !error && <div className="initial-loading" role="status">Loading the collection…</div>}{catalog && <><Hero /><div className="content-wrap"><Maker catalog={catalog} designId={designId} setDesignId={selectDesign} /><PrintedExamples /></div></>}
       <section className="about-section" id="about" aria-labelledby="about-title"><div className="about-inner">
         <article className="about-card">
           <h2 id="about-title">About Spectral Reflectance <code className="about-mark">// make</code></h2>

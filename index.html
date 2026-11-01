@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
     <meta name="description" content="Explore printable bag tag designs from Spectral Reflectance. Preview 2D and 3D geometry, choose a colour palette, and download 3MF files." />
     <link rel="canonical" href="https://www.make.spectralreflectance.space/" />
+    <link rel="describedby" href="/llms.txt" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Spectral Reflectance // make" />
     <meta property="og:title" content="3D prints for the EO community | Spectral Reflectance // make" />
@@ -22,10 +23,65 @@
     <meta name="twitter:title" content="3D prints for the EO community | Spectral Reflectance // make" />
     <meta name="twitter:description" content="Choose a bag tag design, try a colour palette, and download the files to print it." />
     <meta name="twitter:image" content="https://www.make.spectralreflectance.space/preview-social.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://www.make.spectralreflectance.space/#website",
+            "name": "Spectral Reflectance // make",
+            "url": "https://www.make.spectralreflectance.space/",
+            "description": "Free 3D-printable bag tags for the Earth Observation community."
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://www.make.spectralreflectance.space/#customizer",
+            "name": "Spectral Reflectance // make bag tag customizer",
+            "url": "https://www.make.spectralreflectance.space/#maker",
+            "description": "Choose a bag tag design and three colours, preview it in 2D and 3D, and download printable files.",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Web browser",
+            "isAccessibleForFree": true,
+            "image": "https://www.make.spectralreflectance.space/preview-social.png",
+            "isPartOf": { "@id": "https://www.make.spectralreflectance.space/#website" }
+          }
+        ]
+      }
+    </script>
+    <style>
+      .crawl-fallback{max-width:1060px;margin:auto;padding:30px 24px 70px;color:#0d1d3b;font-family:system-ui,sans-serif;line-height:1.6}
+      .crawl-fallback header{display:flex;justify-content:space-between;align-items:center;gap:20px;border-bottom:1px solid #e9e5e0;padding-bottom:20px}
+      .crawl-fallback a{color:#870b2b;text-underline-offset:3px}
+      .crawl-fallback h1{font-size:clamp(38px,6vw,60px);line-height:1.1;margin:65px 0 16px}
+      .crawl-fallback h2{font-size:26px;margin:42px 0 12px}
+      .crawl-fallback p{max-width:720px;color:#4f5b70}
+      .crawl-fallback .designs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:22px}
+      .crawl-fallback article{border:1px solid #e4e2df;border-radius:8px;padding:20px}
+      .crawl-fallback article h3{margin:0 0 8px}
+      @media(max-width:650px){.crawl-fallback .designs{grid-template-columns:1fr}}
+    </style>
     <title>Make 3D prints · Spectral Reflectance</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="crawl-fallback">
+        <header><strong>Spectral Reflectance // make</strong><a href="/licence/">Licence &amp; credits</a></header>
+        <main>
+          <h1>3D prints for the EO community</h1>
+          <p>Choose a bag tag design, try a colour palette, and download the files to print it. Both designs are NFC-free and available as multicolour 3MF or single-colour STL files.</p>
+          <h2>Designs</h2>
+          <div class="designs">
+            <article><h3><a href="/designs/trust-the-agent/">Trust the Agent, Blame the Human</a></h3><p>An Earth Observation and AI-themed tag first designed for the Agentic AI for EO workshop in Berlin. Choose from two predefined three-colour palettes or set your own colours.</p></article>
+            <article><h3><a href="/designs/stac-or-it-doesnt-exist/">STAC or It Doesn't Exist</a></h3><p>An unofficial design celebrating open geospatial data and the SpatioTemporal Asset Catalog specification. Choose White, Blue &amp; Gold or set your own colours.</p></article>
+          </div>
+          <h2>About Spectral Reflectance // make</h2>
+          <p>The original tags were giveaways at the Agentic AI for EO workshop in Berlin. These versions are free to customise, download and 3D print for non-commercial use, subject to the <a href="/licence/">licence and artwork credits</a>.</p>
+          <p>Find more of the creator's work at <a href="https://www.spectralreflectance.space/" target="_blank" rel="noopener noreferrer">Spectral Reflectance</a>.</p>
+          <noscript><p>The interactive colour preview needs JavaScript. The design pages above provide the predefined 3MF and STL downloads without it.</p></noscript>
+        </main>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

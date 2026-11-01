@@ -1,0 +1,17 @@
+# Spectral Reflectance // make
+
+> Free 3D-printable bag tag designs without NFC chips for the Earth Observation and geospatial community, created by Spectral Reflectance.
+
+This personal maker project began with tags made for the Agentic AI for EO workshop in Berlin. The site currently offers two designs: Trust the Agent, Blame the Human, and STAC or It Doesn't Exist. The STAC tag adapts third-party artwork; its credits and rights are explained on the licence page.
+
+Visitors can choose a design, select a predefined three-colour palette or set three custom colours, preview the front and back in 2D and the model in 3D, and download a 3MF or STL file. The 3MF contains separate colour parts; the STL has no colour information. Filament choices and sliced layers must be checked in Bambu Studio before printing.
+
+Spectral Reflectance's own design work is shared for non-commercial use under CC BY-NC 4.0. See the licence page for attribution guidance and the separate rights of the adapted STAC artwork.
+
+## Pages
+
+- [Make website and customizer](https://www.make.spectralreflectance.space/): Choose colours, preview and download the tags.
+- [Trust the Agent design](https://www.make.spectralreflectance.space/designs/trust-the-agent/): Design background, printable files and guidance.
+- [STAC or It Doesn't Exist design](https://www.make.spectralreflectance.space/designs/stac-or-it-doesnt-exist/): Design background, printable files and artwork credit.
+- [Licence and artwork credits](https://www.make.spectralreflectance.space/licence/): Full terms, attribution and third-party artwork credits.
+- [Spectral Reflectance publication](https://www.spectralreflectance.space/): Earth Observation publication by the creator.
