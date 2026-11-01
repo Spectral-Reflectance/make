@@ -212,7 +212,7 @@ export function App() {
         <article className="about-card">
           <h2 id="about-title">About Spectral Reflectance <code className="about-mark">// make</code></h2>
           <p>I originally designed these tags as giveaways for the Agentic AI for EO workshop in Berlin. They turned out to be more popular than I expected!</p>
-          <p>The ones I handed out had NFC chips linking to <a href="https://www.spectralreflectance.space/" target="_blank" rel="noopener noreferrer">Spectral Reflectance</a>, my publication on Earth Observation. So I thought, why not share the designs and let people print their own?</p>
+          <p>The ones I handed out had NFC chips linking to <a href="https://www.spectralreflectance.space/" target="_blank" rel="noopener noreferrer">Spectral Reflectance</a>. So I thought, why not share the designs and let people print their own?</p>
           <p>Here you'll find NFC-free versions to customise, download and 3D print. Pick your colours and have fun with them! :)</p>
         </article>
         <article className="licence-card">
