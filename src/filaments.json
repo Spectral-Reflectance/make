@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "reviewed": "2026-11-01",
+  "brands": [
+    {
+      "id": "bambu-lab",
+      "name": "Bambu Lab",
+      "defaultRangeId": "pla-basic",
+      "ranges": [
+        {
+          "id": "pla-basic",
+          "name": "PLA Basic",
+          "sourceUrl": "https://store.bblcdn.eu/s8/default/903b60b06ac142e9b1b49ad53cfa4c82/Bambu_PLA_Basic_Hex_Code.pdf",
+          "colours": [
+            ["Jade White", "#FFFFFF"], ["Beige", "#F7E6DE"], ["Light Gray", "#D1D3D5"], ["Silver", "#A6A9AA"], ["Gray", "#8E9089"],
+            ["Magenta", "#EC008C"], ["Pink", "#F55A74"], ["Hot Pink", "#F5547C"], ["Orange", "#FF6A13"], ["Pumpkin Orange", "#FF9016"],
+            ["Gold", "#E4BD68"], ["Sunflower Yellow", "#FEC600"], ["Yellow", "#F4EE2A"], ["Bright Green", "#BECF00"], ["Bambu Green", "#00AE42"],
+            ["Mistletoe Green", "#3F8E43"], ["Bronze", "#847D48"], ["Cocoa Brown", "#6F5034"], ["Brown", "#9D432C"], ["Maroon Red", "#9D2235"],
+            ["Red", "#C12E1F"], ["Turquoise", "#00B1B7"], ["Cyan", "#0086D6"], ["Blue", "#0A2989"], ["Cobalt Blue", "#0056B8"],
+            ["Purple", "#5E43B7"], ["Indigo Purple", "#482960"], ["Blue Grey", "#5B6579"], ["Dark Gray", "#545454"], ["Black", "#000000"]
+          ]
+        },
+        {
+          "id": "pla-matte",
+          "name": "PLA Matte",
+          "sourceUrl": "https://store.bblcdn.eu/s8/default/f131f643495b417197832b291fc7b068/Bambu_PLA_Matte_Hex_Code.pdf",
+          "colours": [
+            ["Ivory White", "#FFFFFF"], ["Bone White", "#CBC6B8"], ["Desert Tan", "#E8DBB7"], ["Latte Brown", "#D3B7A7"], ["Caramel", "#AE835B"],
+            ["Terracotta", "#B15533"], ["Dark Brown", "#7D6556"], ["Dark Chocolate", "#4D3324"], ["Lilac Purple", "#AE96D4"], ["Sakura Pink", "#E8AFCF"],
+            ["Mandarin Orange", "#F99963"], ["Lemon Yellow", "#F7D959"], ["Plum", "#950051"], ["Scarlet Red", "#DE4343"], ["Dark Red", "#BB3D43"],
+            ["Dark Green", "#68724D"], ["Grass Green", "#61C680"], ["Apple Green", "#C2E189"], ["Ice Blue", "#A3D8E1"], ["Sky Blue", "#56B7E6"],
+            ["Marine Blue", "#0078BF"], ["Dark Blue", "#042F56"], ["Ash Gray", "#9B9EA0"], ["Nardo Gray", "#757575"], ["Charcoal", "#000000"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sunlu",
+      "name": "SUNLU",
+      "defaultRangeId": "pla-plus",
+      "ranges": [
+        {
+          "id": "pla-plus",
+          "name": "PLA+",
+          "sourceUrl": "https://www.sunlu.com/products/221",
+          "colours": [
+            ["Grey", "#75787B"], ["White", "#FFFFFF"], ["Black", "#000000"], ["Red", "#BC2726"], ["Yellow", "#FFF13F"],
+            ["Green", "#1DAA27"], ["Cyan", "#00A3E0"], ["Beige", "#F0E0D6"], ["Ceramic", "#F4F9FF"], ["Bone White", "#EEE7D4"],
+            ["Oak", "#C2B29A"], ["Vivid Yellow", "#EAC642"], ["Coffee Brown", "#362111"], ["Magenta", "#C52E79"], ["Roasted Chestnut", "#1D0E07"],
+            ["Olive Green", "#5A6D3D"], ["Sunny Orange", "#ED7334"], ["Midnight", "#28334A"], ["Klein Blue", "#1729AB"], ["Lavender Purple", "#685BC7"]
+          ]
+        },
+        {
+          "id": "pla-meta",
+          "name": "PLA Meta",
+          "sourceUrl": "https://www.sunlu.com/products/261",
+          "colours": [
+            ["Grey", "#75787B"], ["Black", "#000000"], ["Teal", "#009CA6"], ["Cream White", "#EEE7D4"], ["Cherry Red", "#ED374D"],
+            ["Sunny Orange", "#FC8B4C"], ["Lemon Yellow", "#FBF9AF"], ["Olive Green", "#5A6D3D"], ["Mint Green", "#03CCB5"], ["Sky Blue", "#0AB4E5"],
+            ["Taro Purple", "#AF98DF"], ["Sakura Pink", "#FDD4DE"], ["Chocolate", "#895A4E"], ["White", "#FFFFFF"], ["Ice Blue", "#9FECF7"], ["Apple Green", "#A9EAA7"]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "esun",
+      "name": "eSUN",
+      "defaultRangeId": "pla-plus",
+      "ranges": [
+        {
+          "id": "pla-plus",
+          "name": "PLA+",
+          "sourceUrl": "https://www.esun3d.com/pla-pro-product",
+          "colours": [
+            ["Milky White", "#C9C9C9"], ["Mint Green", "#69C296"], ["Mustard Green", "#E4E6A5"], ["Olive Green", "#1B1F11"], ["Orange", "#FF821B"],
+            ["Peach Pink", "#EEB9B3"], ["Peak Green", "#38D844"], ["Pine Green", "#43634E"], ["Pink", "#FF7F6F"], ["Black", "#272729"],
+            ["Red", "#B40200"], ["RGB Blue", "#1E4FCF"], ["RGB Green", "#9AEE74"], ["RGB Red", "#E6413F"], ["Silver", "#68676C"],
+            ["Soft Blue", "#71D6E8"], ["Soft Pink", "#F89F93"], ["Space Blue", "#50D3FF"], ["Very Peri", "#22047E"], ["White", "#F6F6F6"],
+            ["Yellow", "#FFFC01"], ["Almond Yellow", "#E9E199"], ["Apricot", "#E68A1D"], ["Aqua", "#6BBFE3"], ["Blue", "#01378D"],
+            ["Bone White", "#C7B494"], ["Brick Red", "#9B5347"], ["Brown", "#664033"], ["Cold White", "#DBD6DC"], ["Beige", "#FDC094"],
+            ["Coral Orange", "#FF8C49"], ["Dark Blue", "#262431"], ["Fire Engine Red", "#BB2028"], ["Grass Green", "#2B6439"], ["Green", "#1B2D39"],
+            ["Gold", "#EDA10F"], ["Grey", "#606783"], ["Haze Blue", "#7AB9EF"], ["Holly Green", "#03594E"], ["Jade Green", "#53ECD0"],
+            ["Light Beige", "#E5C0A3"], ["Light Blue", "#169BEA"], ["Light Brown", "#C99367"], ["Light Khaki", "#C6C0A8"], ["Lilac", "#C78DBF"],
+            ["Magenta", "#E02552"], ["Matcha Green", "#989F4F"], ["Purple", "#793EB6"], ["Concrete Grey", "#B7B7B5"]
+          ]
+        },
+        {
+          "id": "pla-matte",
+          "name": "PLA-Matte",
+          "sourceUrl": "https://www.esun3d.com/epla-matte-product",
+          "colours": [
+            ["Milky White", "#C9C9C9"], ["Mint Green", "#69C296"], ["Olive Green", "#1B1F11"], ["Peach Pink", "#EEB9B3"], ["Black", "#272729"],
+            ["Almond Yellow", "#E9E199"], ["Aqua", "#6BBFE3"], ["Fire Engine Red", "#BB2028"], ["Light Blue", "#169BEA"], ["Light Khaki", "#C6C0A8"],
+            ["Lilac", "#C78DBF"], ["Matcha Green", "#989F4F"], ["Concrete Grey", "#B7B7B5"], ["Strawberry Red", "#F18579"], ["Tangerine", "#CE4D0B"],
+            ["Morandi Green", "#0D353D"], ["Morandi Purple", "#C17B7D"], ["Dark Grey", "#5F6366"]
+          ]
+        }
+      ]
+    }
+  ]
+}

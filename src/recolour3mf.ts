@@ -1,10 +1,21 @@
 import { strFromU8, strToU8, unzipSync, zipSync } from 'fflate';
 import { colorIds, type Palette } from './data';
+import type { FilamentTriplet } from './filamentPicker';
 
 const modelPath = '3D/3dmodel.model';
 
+export interface FilamentSelection {
+  brand: string;
+  range: string;
+  filaments: FilamentTriplet;
+}
+
+function escapeXml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+}
+
 /** Change 3MF material colours and references; keep every solid and mesh intact. */
-export function recolour3mf(template: Uint8Array, source: Palette, target: Palette): Uint8Array {
+export function recolour3mf(template: Uint8Array, source: Palette, target: Palette, selection?: FilamentSelection): Uint8Array {
   const files = unzipSync(template);
   const model = files[modelPath];
   if (!model) throw new Error('The 3MF has no model data.');
@@ -45,6 +56,11 @@ export function recolour3mf(template: Uint8Array, source: Palette, target: Palet
       if (next === undefined) throw new Error('The 3MF uses an unknown colour index.');
       return `${key}="${next}"`;
     });
+  }
+  if (selection) {
+    const description = `Filament colour guide: ${selection.brand} ${selection.range}; ${selection.filaments.map((filament, index) => `${index + 1}. ${filament.name} (${filament.hex})`).join('; ')}. Confirm filament profiles and AMS mapping in the slicer.`;
+    if (!xml.includes('<resources>')) throw new Error('The 3MF model has no resources element.');
+    xml = xml.replace('<resources>', `<metadata name="Description">${escapeXml(description)}</metadata><resources>`);
   }
   files[modelPath] = strToU8(xml);
   return zipSync(files, { level: 6 });

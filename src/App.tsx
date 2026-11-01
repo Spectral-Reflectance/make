@@ -1,6 +1,8 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { FacePreview } from './FacePreview';
-import { assetStem, assetUrl, customTriplet, paletteEntries, withTripletColor, type Catalog, type DesignInfo, type Palette, type TripletSlot } from './data';
+import { FilamentSelector } from './FilamentSelector';
+import { filamentBrands, matchFilaments, paletteForFilaments, type Filament, type FilamentTriplet, type FilamentBrand, type FilamentRange } from './filamentPicker';
+import { assetStem, assetUrl, type Catalog, type DesignInfo, type Palette } from './data';
 
 const ModelPreview = lazy(async () => ({ default: (await import('./ModelPreview')).ModelPreview }));
 
@@ -27,7 +29,7 @@ function Hero() {
       </div>
       <div className="hero-copy">
         <h1 id="hero-title">3D prints<br />for the EO community</h1>
-        <p>Choose a bag tag design, try a colour palette, and download the files to print it.</p>
+        <p>Choose a bag tag design, pick three filaments, and download the files to print it.</p>
         <div className="hero-actions">
           <a className="button button-primary" href="#maker">Start making</a>
           <a className="button button-outline" href="#examples">See printed examples</a>
@@ -49,55 +51,50 @@ function DesignChoice({ design, selected, palette, onSelect }: { design: DesignI
 
 function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId: string; setDesignId: (id: string) => void }) {
   const initialDesign = catalog.designs.find(({ id }) => id === designId) ?? catalog.designs[0];
-  const [paletteId, setPaletteId] = useState(initialDesign.paletteIds[0]);
-  const [customSourceId, setCustomSourceId] = useState(initialDesign.templatePaletteId);
-  const [customPalette, setCustomPalette] = useState<Palette>(customTriplet(catalog.palettes[initialDesign.paletteIds[0]], initialDesign.slotRoleIndex));
+  const [brand, setBrand] = useState<FilamentBrand>(filamentBrands[0]);
+  const [range, setRange] = useState<FilamentRange>(filamentBrands[0].ranges[0]);
+  const [filaments, setFilaments] = useState<FilamentTriplet>(() => matchFilaments(catalog.palettes[initialDesign.paletteIds[0]].filaments!.map(({ hex }) => hex), filamentBrands[0].ranges[0]));
   const [view, setView] = useState<'2d' | '3d' | 'plate'>('3d');
   const [faceSide, setFaceSide] = useState<'front' | 'back'>('front');
   const [downloadBusy, setDownloadBusy] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const printDialogRef = useRef<HTMLDialogElement>(null);
   const design = catalog.designs.find(({ id }) => id === designId) ?? catalog.designs[0];
-  const isCustom = paletteId === 'custom';
-  const selectedPaletteId = design.paletteIds.includes(paletteId) ? paletteId : design.paletteIds[0];
-  const sourcePaletteId = isCustom ? customSourceId : selectedPaletteId;
-  const palette = isCustom ? customPalette : catalog.palettes[selectedPaletteId];
-  const stem = assetStem(design.id, sourcePaletteId);
+  const palette = paletteForFilaments(filaments, design.slotRoleIndex, brand, range);
+  const stem = assetStem(design.id, design.templatePaletteId);
   const selectDesign = (next: DesignInfo) => {
-    const firstPalette = next.paletteIds[0];
     setDesignId(next.id);
-    setPaletteId(firstPalette);
-    setCustomSourceId(next.templatePaletteId);
-    setCustomPalette(customTriplet(catalog.palettes[firstPalette], next.slotRoleIndex));
+    setFilaments(matchFilaments(catalog.palettes[next.paletteIds[0]].filaments!.map(({ hex }) => hex), range));
   };
-  const selectCustom = () => {
-    if (!isCustom) {
-      // The source asset has four distinct material colours. Presets may
-      // deliberately combine them, so always recolour the source 3MF.
-      setCustomSourceId(design.templatePaletteId);
-      setCustomPalette(customTriplet(palette, design.slotRoleIndex));
-    }
-    setPaletteId('custom');
+  const changeBrand = (next: FilamentBrand) => {
+    const nextRange = next.ranges.find(({ id }) => id === next.defaultRangeId) ?? next.ranges[0];
+    setFilaments(matchFilaments(filaments.map(({ hex }) => hex), nextRange));
+    setBrand(next);
+    setRange(nextRange);
   };
-  const changeCustomColor = (slot: TripletSlot, hex: string) => setCustomPalette((current) => withTripletColor(current, slot, hex, design.slotRoleIndex));
-  const downloadCustom3mf = async () => {
+  const changeRange = (next: FilamentRange) => {
+    setFilaments(matchFilaments(filaments.map(({ hex }) => hex), next));
+    setRange(next);
+  };
+  const changeFilament = (slot: 0 | 1 | 2, filament: Filament) => setFilaments((current) => current.map((item, index) => index === slot ? filament : item) as FilamentTriplet);
+  const download3mf = async () => {
     setDownloadBusy(true);
     setDownloadError(null);
     try {
       const response = await fetch(assetUrl(`${stem}.3mf`));
       if (!response.ok) throw new Error('The 3MF template could not be loaded.');
       const { recolour3mf } = await import('./recolour3mf');
-      const bytes = recolour3mf(new Uint8Array(await response.arrayBuffer()), catalog.palettes[sourcePaletteId], customPalette);
+      const bytes = recolour3mf(new Uint8Array(await response.arrayBuffer()), catalog.palettes[design.templatePaletteId], palette, { brand: brand.name, range: range.name, filaments });
       const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: 'model/3mf' }));
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${design.id}-custom.3mf`;
+      link.download = `${design.id}-${brand.id}-${range.id}.3mf`;
       document.body.append(link);
       link.click();
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (reason) {
-      setDownloadError(reason instanceof Error ? reason.message : 'Custom 3MF could not be prepared.');
+      setDownloadError(reason instanceof Error ? reason.message : 'The 3MF could not be prepared.');
     } finally {
       setDownloadBusy(false);
     }
@@ -105,7 +102,7 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
   return (
     <section className="maker-section" id="maker" aria-labelledby="maker-title">
       <div className="section-heading maker-heading">
-        <div><h2 id="maker-title">Make your own</h2><p>Choose a design, pick your colours, preview the tag and download the files.</p></div>
+        <div><h2 id="maker-title">Make your own</h2><p>Choose a design, pick three filaments, preview the tag and download the files.</p></div>
       </div>
       <div className="maker-grid">
         <div className="maker-panel maker-controls">
@@ -114,22 +111,9 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
             <div className="design-options">{catalog.designs.map((item) => <DesignChoice key={item.id} design={item} selected={item.id === design.id} palette={catalog.palettes[item.paletteIds[0]]} onSelect={() => selectDesign(item)} />)}</div>
           </div>
           <div className="control-group maker-palettes">
-            <div className="panel-heading"><h3>2. Select colours</h3></div>
-          <div className="palette-options" role="radiogroup" aria-label="Colour palette">
-            {paletteEntries(catalog, design).map(([id, item]) => <label className={`palette-option ${paletteId === id ? 'is-selected' : ''}`} key={id}>
-              <input type="radio" name="palette" value={id} checked={paletteId === id} onChange={() => { setPaletteId(id); setCustomPalette(customTriplet(item, design.slotRoleIndex)); }} />
-              <span>{item.name}</span><Swatches palette={item} />
-            </label>)}
-            <label className={`palette-option ${isCustom ? 'is-selected' : ''}`}>
-              <input type="radio" name="palette" value="custom" checked={isCustom} onChange={selectCustom} />
-              <span>Select Custom colours</span><Swatches palette={customPalette} />
-            </label>
-          </div>
-          {isCustom && <fieldset className="custom-colours"><legend>Custom colours</legend>
-            <p>Colours 1–3 follow the preset swatches from left to right.</p>
-            {([0, 1, 2] as const).map((slot) => <label key={slot}><span>Colour {slot + 1}</span><input type="color" value={customPalette.swatches?.[slot]} onChange={(event) => changeCustomColor(slot, event.target.value)} aria-label={`Colour ${slot + 1}`} /><output>{customPalette.swatches?.[slot].toUpperCase()}</output></label>)}
-          </fieldset>}
-          <p className="panel-note">The colours are a guide. Choose your own filaments in the slicer before printing.</p>
+            <div className="panel-heading"><h3>2. Choose your filaments</h3></div>
+            <FilamentSelector brand={brand} range={range} filaments={filaments} onBrandChange={changeBrand} onRangeChange={changeRange} onFilamentChange={changeFilament} />
+            <p className="panel-note">Colours are approximate. Check your filaments in the slicer before printing.</p>
           </div>
         </div>
         <div className="maker-panel maker-preview">
@@ -141,15 +125,13 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
           </div>
           <div className="preview-window" role="tabpanel">{view !== '2d' ? <PreviewErrorBoundary key={design.id}><Suspense fallback={<div className="preview-loading" role="status">Loading 3D viewer…</div>}><ModelPreview designId={design.id} paletteId={design.templatePaletteId} palette={palette} meshColorIds={design.meshColorIds} onPlate={view === 'plate'} /></Suspense></PreviewErrorBoundary> : <div className="flat-preview">
             <div className="face-side-switch" role="group" aria-label="2D view side"><button type="button" className={faceSide === 'front' ? 'is-selected' : ''} aria-pressed={faceSide === 'front'} onClick={() => setFaceSide('front')}>Front</button><button type="button" className={faceSide === 'back' ? 'is-selected' : ''} aria-pressed={faceSide === 'back'} onClick={() => setFaceSide('back')}>Back</button></div>
-            <FacePreview designId={design.id} paletteId={sourcePaletteId} palette={palette} side={faceSide} />
+            <FacePreview designId={design.id} paletteId={design.templatePaletteId} palette={palette} side={faceSide} />
           </div>}</div>
         </div>
         <div className="maker-panel maker-download">
           <div className="panel-heading"><h3>4. Download</h3></div>
-          <div className="file-summary"><strong>{design.title}</strong><span>{palette.name} palette</span><Swatches palette={palette} /></div>
-          {isCustom
-            ? <button className="button button-primary download-button" type="button" disabled={downloadBusy} onClick={downloadCustom3mf}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy ? 'Preparing 3MF…' : 'Download 3MF'}<small>Colour regions for filament mapping</small></span></button>
-            : <a className="button button-primary download-button" href={assetUrl(`${stem}.3mf`)} download={`${stem}.3mf`}><span className="download-arrow" aria-hidden="true">↓</span><span>Download 3MF<small>Colour regions for filament mapping</small></span></a>}
+          <div className="file-summary"><strong>{design.title}</strong><span>{brand.name} · {range.name}</span><Swatches palette={palette} /></div>
+          <button className="button button-primary download-button" type="button" disabled={downloadBusy} onClick={download3mf}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy ? 'Preparing 3MF…' : 'Download 3MF'}<small>Colours and names saved in file</small></span></button>
           {downloadError && <p className="download-error" role="alert">{downloadError}</p>}
           <a className="button button-outline download-button" href={assetUrl(`${design.id}.stl`)} download={`${design.id}.stl`}><span className="download-arrow" aria-hidden="true">↓</span><span>Download STL<small>Single-colour solid</small></span></a>
           <button className="print-info-trigger" type="button" aria-haspopup="dialog" aria-controls="print-info" onClick={() => printDialogRef.current?.showModal()}>
@@ -158,10 +140,11 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
           <dialog className="print-dialog" id="print-info" ref={printDialogRef} aria-labelledby="print-dialog-title">
             <h3 id="print-dialog-title">Before printing</h3>
             <p>The 3MF includes separate parts for each colour. Open it in Bambu Studio, assign your filaments, and slice the model.</p>
+            <p>Colours are approximate. Check your filaments in the slicer before printing.</p>
             <p>The STL version doesn't include colour information.</p>
             <form method="dialog"><button className="button button-primary" type="submit">Close</button></form>
           </dialog>
-          <div className="print-details"><h4>Details</h4><dl><div><dt>Size</dt><dd>60 × 100 × 2 mm</dd></div>{palette.filaments && <div><dt>Bambu PLA Basic colours</dt><dd className="filament-list">{palette.filaments.map((filament) => <span key={filament.name}><i aria-hidden="true" style={{ background: filament.hex }} />{filament.name}</span>)}</dd></div>}</dl></div>
+          <div className="print-details"><h4>Details</h4><dl><div><dt>Size</dt><dd>60 × 100 × 2 mm</dd></div><div><dt>{brand.name} {range.name}</dt><dd className="filament-list">{filaments.map((filament, index) => <span key={index}><i aria-hidden="true" style={{ background: filament.hex }} />{filament.name}</span>)}</dd></div></dl></div>
         </div>
       </div>
     </section>
