@@ -1,0 +1,131 @@
+{
+  "palettes": {
+    "trust-original": {
+      "name": "Custom source",
+      "base": "#FFFFFF",
+      "rim": "#9D2235",
+      "primary": "#E9B949",
+      "accent": "#FEC600"
+    },
+    "white-maroon-yellow": {
+      "name": "White, Maroon & Yellow",
+      "base": "#FFFFFF",
+      "rim": "#9D2235",
+      "primary": "#FEC600",
+      "accent": "#FEC600",
+      "filaments": [
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        },
+        {
+          "name": "Maroon Red",
+          "hex": "#9D2235"
+        },
+        {
+          "name": "Sunflower Yellow",
+          "hex": "#FEC600"
+        }
+      ]
+    },
+    "white-blue-gold": {
+      "name": "White, Blue & Gold",
+      "base": "#FFFFFF",
+      "rim": "#0A2989",
+      "primary": "#E4BD68",
+      "accent": "#E4BD68",
+      "filaments": [
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        },
+        {
+          "name": "Blue",
+          "hex": "#0A2989"
+        },
+        {
+          "name": "Gold",
+          "hex": "#E4BD68"
+        }
+      ]
+    },
+    "stac-white-blue-gold": {
+      "name": "White, Blue & Gold",
+      "base": "#FFFFFF",
+      "rim": "#0A2989",
+      "primary": "#0A2989",
+      "accent": "#E4BD68",
+      "filaments": [
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        },
+        {
+          "name": "Blue",
+          "hex": "#0A2989"
+        },
+        {
+          "name": "Gold",
+          "hex": "#E4BD68"
+        }
+      ]
+    }
+  },
+  "designs": [
+    {
+      "id": "trust-the-agent",
+      "title": "Trust the Agent",
+      "description": "A friendly reminder for the AI era.",
+      "paletteIds": [
+        "white-maroon-yellow",
+        "white-blue-gold"
+      ],
+      "templatePaletteId": "trust-original",
+      "slotRoleIndex": {
+        "base": 0,
+        "rim": 1,
+        "primary": 2,
+        "accent": 2
+      },
+      "meshColorIds": [
+        "base",
+        "rim",
+        "accent",
+        "rim",
+        "rim",
+        "rim",
+        "rim",
+        "rim",
+        "base",
+        "accent",
+        "primary"
+      ]
+    },
+    {
+      "id": "stac",
+      "title": "STAC or it doesn't exist",
+      "description": "For those who believe in open geospatial data.",
+      "paletteIds": [
+        "stac-white-blue-gold"
+      ],
+      "templatePaletteId": "stac-white-blue-gold",
+      "slotRoleIndex": {
+        "base": 0,
+        "rim": 1,
+        "primary": 1,
+        "accent": 2
+      },
+      "meshColorIds": [
+        "base",
+        "rim",
+        "rim",
+        "accent",
+        "rim",
+        "accent",
+        "rim",
+        "rim",
+        "rim"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 845" preserveAspectRatio="none">
+  <defs>
+    <filter id="soft-edge" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="55"/>
+    </filter>
+    <linearGradient id="left-edge" x1="0" y1="0" x2="85" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#000"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <mask id="edge-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="800" height="845">
+      <rect width="800" height="845" fill="url(#left-edge)"/>
+    </mask>
+  </defs>
+  <path d="M 90 -100 C 85 80 135 170 210 300 C 280 420 205 520 125 615 C 65 700 55 780 80 945 L 1000 945 L 1000 -100 Z" fill="#fff" filter="url(#soft-edge)" mask="url(#edge-mask)"/>
+</svg>
