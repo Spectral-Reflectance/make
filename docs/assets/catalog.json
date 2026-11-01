@@ -111,27 +111,6 @@
           "hex": "#FEC600"
         }
       ]
-    },
-    "stac-blue-gold-white": {
-      "name": "Blue, Gold & White",
-      "base": "#0A2989",
-      "rim": "#E4BD68",
-      "primary": "#E4BD68",
-      "accent": "#FFFFFF",
-      "filaments": [
-        {
-          "name": "Blue",
-          "hex": "#0A2989"
-        },
-        {
-          "name": "Gold",
-          "hex": "#E4BD68"
-        },
-        {
-          "name": "White",
-          "hex": "#FFFFFF"
-        }
-      ]
     }
   },
   "designs": [
@@ -171,8 +150,7 @@
       "paletteIds": [
         "stac-white-blue-gold",
         "stac-gold-purple-orange",
-        "stac-white-maroon-yellow",
-        "stac-blue-gold-white"
+        "stac-white-maroon-yellow"
       ],
       "templatePaletteId": "stac-white-blue-gold",
       "slotRoleIndex": {
