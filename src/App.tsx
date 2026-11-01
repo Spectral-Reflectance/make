@@ -24,11 +24,11 @@ function Swatches({ palette }: { palette: Palette }) {
   return <span className="swatches" aria-hidden="true">{colors.map((color, index) => <i key={`${color}-${index}`} style={{ background: color }} />)}</span>;
 }
 
-function Hero() {
+function Hero({ theme }: { theme: Theme }) {
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-image">
-        <img src={`${import.meta.env.BASE_URL}hero-image.png`} alt="Printed Spectral Reflectance bag tags and holders on a wooden table" />
+        <img src={`${import.meta.env.BASE_URL}${theme === 'dark' ? 'dark-theme-hero-image.png' : 'hero-image.png'}`} alt={theme === 'dark' ? 'Printed Trust the Agent bag tag on a dark tabletop' : 'Printed Spectral Reflectance bag tags and holders on a wooden table'} />
       </div>
       <div className="hero-copy">
         <h1 id="hero-title">3D prints<br />for the EO community</h1>
@@ -261,7 +261,7 @@ export function App() {
   return <>
     <a className="skip-link" href="#main">Skip to content</a>
     <header className="site-header"><div className="header-inner"><a className="brand" href="#top" aria-label="Spectral Reflectance make, home"><strong>Spectral Reflectance</strong><span className="brand-divider" aria-hidden="true">//</span><span className="brand-make">make</span></a><nav aria-label="Main navigation"><a href="#about">About</a><a href="https://www.spectralreflectance.space/" target="_blank" rel="noopener noreferrer" aria-label="Spectral Reflectance (opens in a new tab)">Spectral Reflectance <span aria-hidden="true">↗</span></a></nav><ThemeToggle theme={theme} onToggle={toggleTheme} /></div></header>
-    <main id="main"><div id="top" />{error && <div className="load-error" role="alert">{error}</div>}{!catalog && !error && <div className="initial-loading" role="status">Loading the collection…</div>}{catalog && <><Hero /><div className="content-wrap"><Maker catalog={catalog} designId={designId} setDesignId={selectDesign} theme={theme} /><PrintedExamples /></div></>}
+    <main id="main"><div id="top" />{error && <div className="load-error" role="alert">{error}</div>}{!catalog && !error && <div className="initial-loading" role="status">Loading the collection…</div>}{catalog && <><Hero theme={theme} /><div className="content-wrap"><Maker catalog={catalog} designId={designId} setDesignId={selectDesign} theme={theme} /><PrintedExamples /></div></>}
       <section className="about-section" id="about" aria-labelledby="about-title"><div className="about-inner">
         <article className="about-card">
           <h2 id="about-title">About Spectral Reflectance <code className="about-mark">// make</code></h2>

@@ -995,6 +995,7 @@ h1,h2,h3 {
 [data-theme=dark] .theme-icon-moon {display:none}
 [data-theme=dark] .theme-icon-sun {display:block}
 [data-theme=dark] .hero {background:linear-gradient(100deg,#101722 20%,#192331 70%,#101722 100%)}
+[data-theme=dark] .hero-image img {object-fit:cover;object-position:center center}
 [data-theme=dark] .hero p,[data-theme=dark] .section-heading p {color:#A6B3C5}
 [data-theme=dark] .button-primary {background:#a3244b;border-color:#a3244b;color:#fff}
 [data-theme=dark] .button-primary:hover {background:#bc355b;border-color:#bc355b}
