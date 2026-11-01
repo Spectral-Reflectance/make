@@ -4,12 +4,12 @@
 
 This personal maker project began with tags made for the Agentic AI for EO workshop in Berlin. The site currently offers two designs: Trust the Agent, Blame the Human, and STAC or It Doesn't Exist. The STAC tag adapts third-party artwork; its credits and rights are explained on the licence page.
 
-Visitors can choose a design, select one of its predefined three-colour palettes, or pick three named PLA filaments from a locally maintained Bambu Lab, SUNLU or eSUN catalogue. They can preview the front and back in 2D and the model in 3D, then download a 3MF or STL file. Custom 3MF files contain separate colour parts and the selected filament names as metadata; STL has no colour information. Filament choices and sliced layers must be checked in Bambu Studio before printing.
+Visitors can choose a design, select one of its predefined three-colour palettes, or set three custom colours. Custom colours can be entered as HEX values with the native colour picker, or matched to named PLA filaments from a locally maintained Bambu Lab, SUNLU or eSUN catalogue. Visitors can preview the front and back in 2D and the model in 3D, then download a 3MF or STL file. Custom 3MF files contain separate colour parts; filament-mode downloads also include selected names as metadata. STL has no colour information. Filament choices and sliced layers must be checked in Bambu Studio before printing.
 
 Spectral Reflectance's own design work is shared for non-commercial use under CC BY-NC 4.0. See the licence page for attribution guidance and the separate rights of the adapted STAC artwork.
 
 ## Pages
 
-- [Make website and customizer](https://www.make.spectralreflectance.space/): Choose a palette or filaments, preview and download the tags.
+- [Make website and customizer](https://www.make.spectralreflectance.space/): Choose a palette or set custom colours, preview and download the tags.
 - [Licence and artwork credits](https://www.make.spectralreflectance.space/licence/): Full terms, attribution and third-party artwork credits.
 - [Spectral Reflectance publication](https://www.spectralreflectance.space/): Earth Observation publication by the creator.

@@ -1,8 +1,9 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { FacePreview } from './FacePreview';
 import { FilamentSelector } from './FilamentSelector';
+import { ManualColourSelector } from './ManualColourSelector';
 import { filamentBrands, matchFilaments, paletteForFilaments, type Filament, type FilamentTriplet, type FilamentBrand, type FilamentRange } from './filamentPicker';
-import { assetStem, assetUrl, paletteEntries, type Catalog, type DesignInfo, type Palette } from './data';
+import { assetStem, assetUrl, customTriplet, paletteEntries, withTripletColor, type Catalog, type DesignInfo, type Palette, type TripletSlot } from './data';
 
 const ModelPreview = lazy(async () => ({ default: (await import('./ModelPreview')).ModelPreview }));
 
@@ -29,7 +30,7 @@ function Hero() {
       </div>
       <div className="hero-copy">
         <h1 id="hero-title">3D prints<br />for the EO community</h1>
-        <p>Choose a bag tag design, try a colour palette or pick your own filaments, and download the files to print it.</p>
+        <p>Choose a bag tag design, try a colour palette, and download the files to print it.</p>
         <div className="hero-actions">
           <a className="button button-primary" href="#maker">Start making</a>
           <a className="button button-outline" href="#examples">See printed examples</a>
@@ -52,6 +53,8 @@ function DesignChoice({ design, selected, palette, onSelect }: { design: DesignI
 function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId: string; setDesignId: (id: string) => void }) {
   const initialDesign = catalog.designs.find(({ id }) => id === designId) ?? catalog.designs[0];
   const [paletteId, setPaletteId] = useState(initialDesign.paletteIds[0]);
+  const [customMode, setCustomMode] = useState<'any' | 'filament'>('any');
+  const [manualPalette, setManualPalette] = useState<Palette>(() => customTriplet(catalog.palettes[initialDesign.paletteIds[0]], initialDesign.slotRoleIndex));
   const [brand, setBrand] = useState<FilamentBrand>(filamentBrands[0]);
   const [range, setRange] = useState<FilamentRange>(filamentBrands[0].ranges[0]);
   const [filaments, setFilaments] = useState<FilamentTriplet>(() => matchFilaments(catalog.palettes[initialDesign.paletteIds[0]].filaments!.map(({ hex }) => hex), filamentBrands[0].ranges[0]));
@@ -63,24 +66,42 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
   const design = catalog.designs.find(({ id }) => id === designId) ?? catalog.designs[0];
   const isCustom = paletteId === 'custom';
   const selectedPaletteId = design.paletteIds.includes(paletteId) ? paletteId : design.paletteIds[0];
-  const customPalette = paletteForFilaments(filaments, design.slotRoleIndex, brand, range);
+  const filamentPalette = paletteForFilaments(filaments, design.slotRoleIndex, brand, range);
+  const customPalette = customMode === 'any' ? manualPalette : filamentPalette;
   const palette = isCustom ? customPalette : catalog.palettes[selectedPaletteId];
   const stem = assetStem(design.id, isCustom ? design.templatePaletteId : selectedPaletteId);
   const selectDesign = (next: DesignInfo) => {
     setDesignId(next.id);
     setPaletteId(next.paletteIds[0]);
+    setCustomMode('any');
+    setManualPalette(customTriplet(catalog.palettes[next.paletteIds[0]], next.slotRoleIndex));
     setFilaments(matchFilaments(catalog.palettes[next.paletteIds[0]].filaments!.map(({ hex }) => hex), range));
   };
   const selectPreset = (id: string, preset: Palette) => {
     setPaletteId(id);
+    setCustomMode('any');
+    setManualPalette(customTriplet(preset, design.slotRoleIndex));
     setFilaments(matchFilaments(preset.filaments!.map(({ hex }) => hex), range));
     setDownloadError(null);
   };
   const selectCustom = () => {
-    if (!isCustom) setFilaments(matchFilaments(catalog.palettes[selectedPaletteId].filaments!.map(({ hex }) => hex), range));
+    if (!isCustom) {
+      const preset = catalog.palettes[selectedPaletteId];
+      setCustomMode('any');
+      setManualPalette(customTriplet(preset, design.slotRoleIndex));
+      setFilaments(matchFilaments(preset.filaments!.map(({ hex }) => hex), range));
+    }
     setPaletteId('custom');
     setDownloadError(null);
   };
+  const selectCustomMode = (next: 'any' | 'filament') => {
+    if (next === customMode) return;
+    if (next === 'filament') setFilaments(matchFilaments(manualPalette.swatches!, range));
+    else setManualPalette(customTriplet(filamentPalette, design.slotRoleIndex));
+    setCustomMode(next);
+    setDownloadError(null);
+  };
+  const changeManualColour = (slot: TripletSlot, hex: string) => setManualPalette((current) => withTripletColor(current, slot, hex, design.slotRoleIndex));
   const changeBrand = (next: FilamentBrand) => {
     const nextRange = next.ranges.find(({ id }) => id === next.defaultRangeId) ?? next.ranges[0];
     setFilaments(matchFilaments(filaments.map(({ hex }) => hex), nextRange));
@@ -99,11 +120,11 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
       const response = await fetch(assetUrl(`${stem}.3mf`));
       if (!response.ok) throw new Error('The 3MF template could not be loaded.');
       const { recolour3mf } = await import('./recolour3mf');
-      const bytes = recolour3mf(new Uint8Array(await response.arrayBuffer()), catalog.palettes[design.templatePaletteId], customPalette, { brand: brand.name, range: range.name, filaments });
+      const bytes = recolour3mf(new Uint8Array(await response.arrayBuffer()), catalog.palettes[design.templatePaletteId], customPalette, customMode === 'filament' ? { brand: brand.name, range: range.name, filaments } : undefined);
       const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: 'model/3mf' }));
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${design.id}-${brand.id}-${range.id}.3mf`;
+      link.download = customMode === 'filament' ? `${design.id}-${brand.id}-${range.id}.3mf` : `${design.id}-custom.3mf`;
       document.body.append(link);
       link.click();
       link.remove();
@@ -117,7 +138,7 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
   return (
     <section className="maker-section" id="maker" aria-labelledby="maker-title">
       <div className="section-heading maker-heading">
-        <div><h2 id="maker-title">Make your own</h2><p>Choose a design, select a palette or your own filaments, preview the tag and download the files.</p></div>
+        <div><h2 id="maker-title">Make your own</h2><p>Choose a design, select colours, preview the tag and download the files.</p></div>
       </div>
       <div className="maker-grid">
         <div className="maker-panel maker-controls">
@@ -134,10 +155,19 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
               </label>)}
               <label className={`palette-option ${isCustom ? 'is-selected' : ''}`}>
                 <input type="radio" name="palette" value="custom" checked={isCustom} onChange={selectCustom} />
-                <span>Choose filaments by brand</span><Swatches palette={customPalette} />
+                <span>Custom colours</span><Swatches palette={customPalette} />
               </label>
             </div>
-            {isCustom && <div className="filament-custom-panel"><FilamentSelector brand={brand} range={range} filaments={filaments} onBrandChange={changeBrand} onRangeChange={changeRange} onFilamentChange={changeFilament} /></div>}
+            {isCustom && <div className="custom-panel">
+              <h4>Custom colours</h4>
+              <div className="custom-mode-tabs" role="group" aria-label="Custom colour method">
+                <button type="button" className={customMode === 'any' ? 'is-selected' : ''} aria-pressed={customMode === 'any'} onClick={() => selectCustomMode('any')}>Pick any colour</button>
+                <button type="button" className={customMode === 'filament' ? 'is-selected' : ''} aria-pressed={customMode === 'filament'} onClick={() => selectCustomMode('filament')}>Match PLA filaments</button>
+              </div>
+              {customMode === 'any'
+                ? <ManualColourSelector palette={manualPalette} onChange={changeManualColour} />
+                : <FilamentSelector brand={brand} range={range} filaments={filaments} onBrandChange={changeBrand} onRangeChange={changeRange} onFilamentChange={changeFilament} />}
+            </div>}
             <p className="panel-note">Colours are approximate. Check your filaments in the slicer before printing.</p>
           </div>
         </div>
@@ -155,9 +185,9 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
         </div>
         <div className="maker-panel maker-download">
           <div className="panel-heading"><h3>4. Download</h3></div>
-          <div className="file-summary"><strong>{design.title}</strong><span>{isCustom ? `${brand.name} · ${range.name}` : `${palette.name} palette`}</span><Swatches palette={palette} /></div>
+          <div className="file-summary"><strong>{design.title}</strong><span>{isCustom ? (customMode === 'filament' ? `${brand.name} · ${range.name}` : 'Custom colours') : `${palette.name} palette`}</span><Swatches palette={palette} /></div>
           {isCustom
-            ? <button className="button button-primary download-button" type="button" disabled={downloadBusy} onClick={download3mf}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy ? 'Preparing 3MF…' : 'Download 3MF'}<small>Colours and names saved in file</small></span></button>
+            ? <button className="button button-primary download-button" type="button" disabled={downloadBusy} onClick={download3mf}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy ? 'Preparing 3MF…' : 'Download 3MF'}<small>{customMode === 'filament' ? 'Colours and names saved in file' : 'Three custom colour regions'}</small></span></button>
             : <a className="button button-primary download-button" href={assetUrl(`${stem}.3mf`)} download={`${stem}.3mf`}><span className="download-arrow" aria-hidden="true">↓</span><span>Download 3MF<small>Colour regions for filament mapping</small></span></a>}
           {downloadError && <p className="download-error" role="alert">{downloadError}</p>}
           <a className="button button-outline download-button" href={assetUrl(`${design.id}.stl`)} download={`${design.id}.stl`}><span className="download-arrow" aria-hidden="true">↓</span><span>Download STL<small>Single-colour solid</small></span></a>

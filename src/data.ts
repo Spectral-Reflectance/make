@@ -13,6 +13,13 @@ export const colorIds: ColorId[] = ['base', 'rim', 'primary', 'accent'];
 export type TripletSlot = 0 | 1 | 2;
 export type SlotRoleIndex = Record<ColorId, TripletSlot>;
 
+/** Accept common short or full HEX input, with or without a leading #. */
+export function parseHexColour(value: string): string | null {
+  const hex = value.trim().replace(/^#/, '');
+  if (/^[0-9a-fA-F]{3}$/.test(hex)) return `#${[...hex].map((digit) => digit.repeat(2)).join('').toUpperCase()}`;
+  return /^[0-9a-fA-F]{6}$/.test(hex) ? `#${hex.toUpperCase()}` : null;
+}
+
 /** The visible triplet follows the preset swatch positions, not mesh part names. */
 function tripletPalette(swatches: string[], roles: SlotRoleIndex): Palette {
   if (swatches.length !== 3) throw new Error('A custom palette needs three colours.');

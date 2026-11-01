@@ -322,7 +322,12 @@ h1,h2,h3 {
   line-height:1.5
 }
 .filament-selector {display:grid;gap:12px}
-.filament-custom-panel {margin-top:12px;padding:12px 10px;border:1px solid #e1e3e6;border-radius:7px;background:#fbfbfa}
+.custom-panel {display:grid;gap:12px;margin-top:12px;padding:12px 10px;border:1px solid #e1e3e6;border-radius:7px;background:#fbfbfa}
+.custom-panel h4 {margin:0;font-size:12px;font-weight:700}
+.custom-mode-tabs {display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:3px;border:1px solid #e3e4e6;border-radius:8px;background:#f0f0f0}
+.custom-mode-tabs button {min-height:30px;border:0;border-radius:6px;background:transparent;color:#526078;font-size:11px;font-weight:700;cursor:pointer}
+.custom-mode-tabs button.is-selected {background:#fff;color:#0d1d3b;box-shadow:0 1px 4px rgba(13,29,59,.12)}
+.custom-mode-tabs button:focus-visible,.manual-colour-row input:focus-visible {outline:2px solid #8a0b2c;outline-offset:2px}
 .filament-selects {display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .filament-selects label,.filament-search {display:grid;gap:5px;color:#34435d;font-size:11px;font-weight:700}
 .filament-selects select,.filament-search input {width:100%;min-width:0;height:36px;border:1px solid #d9dce2;border-radius:6px;background:#fff;color:#0d1d3b;padding:0 9px;font:inherit;font-size:12px}
@@ -385,40 +390,14 @@ h1,h2,h3 {
   border-radius:50%;
   border:1px solid rgba(0,0,0,.06)
 }
-.custom-colours {
-  display:grid;
-  gap:7px;
-  border:1px solid #e1e3e6;
-  border-radius:7px;
-  margin:12px 0 0;
-  padding:9px 10px 10px
-}
-.custom-colours legend {
-  padding:0 4px;
-  font-size:11px;
-  font-weight:700
-}
-.custom-colours p {margin:0 0 2px;color:#69758c;font-size:10px;line-height:1.4}
-.custom-colours label {
-  display:grid;
-  grid-template-columns:1fr 30px 63px;
-  align-items:center;
-  gap:7px;
-  font-size:11px
-}
-.custom-colours input {
-  width:30px;
-  height:27px;
-  padding:0;
-  border:0;
-  background:transparent;
-  cursor:pointer
-}
-.custom-colours output {
-  font-variant-numeric:tabular-nums;
-  color:#69758c;
-  font-size:10px
-}
+.manual-colours {display:grid;gap:8px}
+.manual-colour-row {display:grid;grid-template-columns:minmax(0,1fr) 34px 112px;align-items:center;gap:8px;font-size:11px;color:#24344f}
+.manual-colour-row input[type=color] {width:34px;height:34px;padding:2px;border:1px solid #d9dce2;border-radius:6px;background:#fff;cursor:pointer}
+.manual-hex-wrap {min-width:0}
+.manual-hex-wrap input {width:100%;height:34px;padding:0 8px;border:1px solid #d9dce2;border-radius:6px;background:#fff;color:#0d1d3b;font:inherit;font-size:11px;font-variant-numeric:tabular-nums}
+.manual-hex-wrap input[aria-invalid=true] {border-color:#a30c32}
+.manual-hex-wrap small {display:block;margin-top:3px;color:#a30c32;font-size:10px;line-height:1.3}
+.manual-colours p {margin:3px 0 0;color:#69758c;font-size:10px;line-height:1.4}
 .maker-preview .panel-heading h3 {
   margin-bottom:11px
 }
