@@ -6,7 +6,9 @@ const catalog = JSON.parse(readFileSync(new URL('catalog.json', assets), 'utf8')
 
 describe('published maker catalogue', () => {
   it('has one complete, distinct file set for each design and palette', () => {
-    expect(catalog.designs.find((design) => design.id === 'stac')?.paletteIds).toEqual(['stac-white-blue-gold']);
+    expect(catalog.designs.find((design) => design.id === 'stac')?.paletteIds).toEqual([
+      'stac-white-blue-gold', 'stac-gold-purple-orange', 'stac-white-maroon-yellow', 'stac-blue-gold-white',
+    ]);
     expect(existsSync(new URL('../public/hero-image.png', import.meta.url))).toBe(true);
     const stems = new Set();
     for (const design of catalog.designs) for (const paletteId of design.paletteIds) {

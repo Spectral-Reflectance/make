@@ -69,6 +69,69 @@
           "hex": "#E4BD68"
         }
       ]
+    },
+    "stac-gold-purple-orange": {
+      "name": "Gold, Purple & Orange",
+      "base": "#E4BD68",
+      "rim": "#5E43B7",
+      "primary": "#5E43B7",
+      "accent": "#FF6A13",
+      "filaments": [
+        {
+          "name": "Gold",
+          "hex": "#E4BD68"
+        },
+        {
+          "name": "Purple",
+          "hex": "#5E43B7"
+        },
+        {
+          "name": "Orange",
+          "hex": "#FF6A13"
+        }
+      ]
+    },
+    "stac-white-maroon-yellow": {
+      "name": "White, Maroon Red & Yellow",
+      "base": "#FFFFFF",
+      "rim": "#9D2235",
+      "primary": "#9D2235",
+      "accent": "#FEC600",
+      "filaments": [
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        },
+        {
+          "name": "Maroon Red",
+          "hex": "#9D2235"
+        },
+        {
+          "name": "Sunflower Yellow",
+          "hex": "#FEC600"
+        }
+      ]
+    },
+    "stac-blue-gold-white": {
+      "name": "Blue, Gold & White",
+      "base": "#0A2989",
+      "rim": "#E4BD68",
+      "primary": "#E4BD68",
+      "accent": "#FFFFFF",
+      "filaments": [
+        {
+          "name": "Blue",
+          "hex": "#0A2989"
+        },
+        {
+          "name": "Gold",
+          "hex": "#E4BD68"
+        },
+        {
+          "name": "White",
+          "hex": "#FFFFFF"
+        }
+      ]
     }
   },
   "designs": [
@@ -106,7 +169,10 @@
       "title": "STAC or it doesn't exist",
       "description": "For those who believe in open geospatial data.",
       "paletteIds": [
-        "stac-white-blue-gold"
+        "stac-white-blue-gold",
+        "stac-gold-purple-orange",
+        "stac-white-maroon-yellow",
+        "stac-blue-gold-white"
       ],
       "templatePaletteId": "stac-white-blue-gold",
       "slotRoleIndex": {
