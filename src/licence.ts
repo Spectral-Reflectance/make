@@ -3,6 +3,9 @@ import '@fontsource-variable/space-grotesk/wght.css';
 import '@fontsource/ibm-plex-mono/latin-500.css';
 import './styles.css';
 import { applyTheme, currentTheme, themeToggleLabel } from './theme';
+import { mountAnalyticsConsent } from './analyticsConsent';
+
+mountAnalyticsConsent();
 
 const themeToggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
 if (themeToggle) {

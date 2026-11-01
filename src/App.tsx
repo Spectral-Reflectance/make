@@ -3,6 +3,7 @@ import { FacePreview } from './FacePreview';
 import { ManualColourSelector } from './ManualColourSelector';
 import { ThemeToggle } from './ThemeToggle';
 import { applyTheme, currentTheme, type Theme } from './theme';
+import { mountAnalyticsConsent, trackFileDownload } from './analyticsConsent';
 import { filamentBrands, matchFilaments, paletteForFilaments, type Filament, type FilamentTriplet, type FilamentBrand, type FilamentRange } from './filamentPicker';
 import { assetStem, assetUrl, customTriplet, paletteEntries, withTripletColor, type Catalog, type DesignInfo, type Palette, type TripletSlot } from './data';
 
@@ -129,6 +130,7 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
       link.download = customMode === 'filament' ? `${design.id}-${brand.id}-${range.id}.3mf` : `${design.id}-custom.3mf`;
       document.body.append(link);
       link.click();
+      trackFileDownload(link.download);
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch (reason) {
@@ -190,9 +192,9 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
           <div className="file-summary"><strong>{design.title}</strong><span>{isCustom ? (customMode === 'filament' ? `${brand.name} · ${range.name}` : 'Custom colours') : `${palette.name} palette`}</span><Swatches palette={palette} /></div>
           {isCustom
             ? <button className="button button-primary download-button" type="button" disabled={downloadBusy} onClick={download3mf}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy ? 'Preparing 3MF…' : 'Download 3MF'}<small>{customMode === 'filament' ? 'Colours and names saved in file' : 'Three custom colour regions'}</small></span></button>
-            : <a className="button button-primary download-button" href={assetUrl(`${stem}.3mf`)} download={`${stem}.3mf`}><span className="download-arrow" aria-hidden="true">↓</span><span>Download 3MF<small>Colour regions for filament mapping</small></span></a>}
+            : <a className="button button-primary download-button" href={assetUrl(`${stem}.3mf`)} download={`${stem}.3mf`} onClick={() => trackFileDownload(`${stem}.3mf`)}><span className="download-arrow" aria-hidden="true">↓</span><span>Download 3MF<small>Colour regions for filament mapping</small></span></a>}
           {downloadError && <p className="download-error" role="alert">{downloadError}</p>}
-          <a className="button button-outline download-button" href={assetUrl(`${design.id}.stl`)} download={`${design.id}.stl`}><span className="download-arrow" aria-hidden="true">↓</span><span>Download STL<small>Single-colour solid</small></span></a>
+          <a className="button button-outline download-button" href={assetUrl(`${design.id}.stl`)} download={`${design.id}.stl`} onClick={() => trackFileDownload(`${design.id}.stl`)}><span className="download-arrow" aria-hidden="true">↓</span><span>Download STL<small>Single-colour solid</small></span></a>
           <button className="print-info-trigger" type="button" aria-haspopup="dialog" aria-controls="print-info" onClick={() => printDialogRef.current?.showModal()}>
             <span className="info-mark" aria-hidden="true">i</span><span className="print-info-label">Before printing</span>
           </button>
@@ -240,6 +242,7 @@ function SupportCard() {
 }
 
 export function App() {
+  useEffect(() => { mountAnalyticsConsent(); }, []);
   const [theme, setTheme] = useState<Theme>(currentTheme);
   const [catalog, setCatalog] = useState<Catalog | null>(null);
   const [error, setError] = useState<string | null>(null);
