@@ -213,15 +213,15 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
 function PrintedExamples() {
   const examples = [
     { title: 'Tags and holders', image: `${import.meta.env.BASE_URL}hero-image.png`, alt: 'Printed Trust the Agent and STAC tags with their holders on a wooden table' },
-    { title: 'Trust the Agent', image: `${import.meta.env.BASE_URL}trust-the-agent-bag-tag.jpg`, alt: 'Printed Trust the Agent bag tag hanging from a black backpack', position: 'center 66%', href: '/?design=trust-the-agent#maker' },
-    { title: 'STAC or it doesn’t exist', image: null, alt: '', href: '/?design=stac#maker' },
+    { title: 'Trust the Agent', image: `${import.meta.env.BASE_URL}trust-the-agent-bag-tag.jpg`, alt: 'Printed Trust the Agent bag tag hanging from a black backpack', position: 'center 66%' },
+    { title: 'STAC or it doesn’t exist', image: null, alt: '' },
     { title: 'Your print here', image: null, alt: '' },
   ];
   return <section className="examples-section" id="examples" aria-labelledby="examples-title">
     <div className="section-heading"><div><h2 id="examples-title">Printed examples</h2><p>More photos are coming. If you print a tag, send us a pic!</p></div></div>
     <div className="examples-grid">{examples.map((example) => <figure className={`example-card ${example.image ? 'has-photo' : 'is-placeholder'}`} key={example.title}>
       {example.image ? <img src={example.image} alt={example.alt} loading="lazy" style={{ objectPosition: example.position ?? 'center' }} /> : <div className="example-placeholder" aria-label="Photo coming soon"><span>Photo coming soon</span></div>}
-      <figcaption>{example.href ? <a href={example.href}>{example.title}</a> : example.title}</figcaption>
+      <figcaption>{example.title}</figcaption>
     </figure>)}</div>
   </section>;
 }

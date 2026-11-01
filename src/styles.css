@@ -713,10 +713,6 @@ h1,h2,h3 {
   font-size:12px;
   font-weight:700
 }
-.example-card figcaption a {
-  color:inherit;
-  text-underline-offset:3px
-}
 .example-placeholder {
   height:100%;
   display:grid;
