@@ -46,9 +46,10 @@ function startAnalytics(): void {
   if (document.getElementById('sr-make-analytics-script')) return;
   const globals = analyticsGlobals();
   globals[DISABLE_KEY] = false;
-  const dataLayer: unknown[][] = [];
+  const dataLayer: IArguments[] = [];
   globals.dataLayer = dataLayer;
-  const gtag = (...args: unknown[]) => dataLayer.push(args);
+  // gtag.js expects the native arguments object used by Google's snippet.
+  function gtag(..._args: unknown[]): void { dataLayer.push(arguments); }
   globals.gtag = gtag;
 
   // Queue consent before loading the Google tag; only analytics is granted.
