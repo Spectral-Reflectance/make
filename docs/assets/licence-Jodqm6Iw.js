@@ -1,0 +1,1 @@
+import{m as i,a as l,c as r,t as s}from"./styles-Bi78O5N2.js";i();const e=document.querySelector("[data-theme-toggle]");if(e){const a=()=>{const t=r();e.setAttribute("aria-label",s(t)),e.setAttribute("title",s(t)),e.setAttribute("aria-pressed",String(t==="dark"))};a(),e.addEventListener("click",()=>{l(r()==="light"?"dark":"light"),a()})}

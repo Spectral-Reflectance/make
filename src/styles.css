@@ -579,6 +579,7 @@ h1,h2,h3 {
   min-height:62px;
   text-align:center
 }
+.download-button:disabled {opacity:.72;cursor:wait}
 .download-button>span:last-child {
   display:flex;
   flex-direction:column;

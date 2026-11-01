@@ -72,10 +72,12 @@ function startAnalytics(): void {
   document.head.append(script);
 }
 
-export function trackFileDownload(fileName: string): void {
+export type MakeEventName = 'design_selected' | 'palette_selected' | 'model_download' | 'filament_brand_selected';
+
+export function trackMakeEvent(name: MakeEventName, parameters: Record<string, string>): void {
   if (!analyticsAllowed) return;
   const gtag = analyticsGlobals().gtag;
-  if (typeof gtag === 'function') gtag('event', 'print_file_download', { file_name: fileName });
+  if (typeof gtag === 'function') gtag('event', name, parameters);
 }
 
 function removeAnalyticsCookies(): void {

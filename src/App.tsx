@@ -3,7 +3,7 @@ import { FacePreview } from './FacePreview';
 import { ManualColourSelector } from './ManualColourSelector';
 import { ThemeToggle } from './ThemeToggle';
 import { applyTheme, currentTheme, type Theme } from './theme';
-import { mountAnalyticsConsent, trackFileDownload } from './analyticsConsent';
+import { mountAnalyticsConsent, trackMakeEvent } from './analyticsConsent';
 import { filamentBrands, matchFilaments, paletteForFilaments, type Filament, type FilamentTriplet, type FilamentBrand, type FilamentRange } from './filamentPicker';
 import { assetStem, assetUrl, customTriplet, paletteEntries, withTripletColor, type Catalog, type DesignInfo, type Palette, type TripletSlot } from './data';
 
@@ -53,6 +53,17 @@ function DesignChoice({ design, selected, palette, onSelect }: { design: DesignI
   );
 }
 
+function startBrowserDownload(blob: Blob, fileName: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; designId: string; setDesignId: (id: string) => void; theme: Theme }) {
   const initialDesign = catalog.designs.find(({ id }) => id === designId) ?? catalog.designs[0];
   const [paletteId, setPaletteId] = useState(initialDesign.paletteIds[0]);
@@ -63,7 +74,7 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
   const [filaments, setFilaments] = useState<FilamentTriplet>(() => matchFilaments(catalog.palettes[initialDesign.paletteIds[0]].filaments!.map(({ hex }) => hex), filamentBrands[0].ranges[0]));
   const [view, setView] = useState<'2d' | '3d' | 'plate'>('3d');
   const [faceSide, setFaceSide] = useState<'front' | 'back'>('front');
-  const [downloadBusy, setDownloadBusy] = useState(false);
+  const [downloadBusy, setDownloadBusy] = useState<'3mf' | 'stl' | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
   const printDialogRef = useRef<HTMLDialogElement>(null);
   const design = catalog.designs.find(({ id }) => id === designId) ?? catalog.designs[0];
@@ -73,21 +84,28 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
   const customPalette = customMode === 'any' ? manualPalette : filamentPalette;
   const palette = isCustom ? customPalette : catalog.palettes[selectedPaletteId];
   const stem = assetStem(design.id, isCustom ? design.templatePaletteId : selectedPaletteId);
+  const downloadPalette = isCustom ? 'custom' : selectedPaletteId;
+  const recordDownload = (format: '3mf' | 'stl') => trackMakeEvent('model_download', { design: design.id, format, palette: downloadPalette });
   const selectDesign = (next: DesignInfo) => {
+    if (next.id === design.id) return;
     setDesignId(next.id);
     setPaletteId(next.paletteIds[0]);
     setCustomMode('any');
     setManualPalette(customTriplet(catalog.palettes[next.paletteIds[0]], next.slotRoleIndex));
     setFilaments(matchFilaments(catalog.palettes[next.paletteIds[0]].filaments!.map(({ hex }) => hex), range));
+    trackMakeEvent('design_selected', { design: next.id });
   };
   const selectPreset = (id: string, preset: Palette) => {
+    if (id === paletteId) return;
     setPaletteId(id);
     setCustomMode('any');
     setManualPalette(customTriplet(preset, design.slotRoleIndex));
     setFilaments(matchFilaments(preset.filaments!.map(({ hex }) => hex), range));
     setDownloadError(null);
+    trackMakeEvent('palette_selected', { design: design.id, palette: id });
   };
   const selectCustom = () => {
+    if (isCustom) return;
     if (!isCustom) {
       const preset = catalog.palettes[selectedPaletteId];
       setCustomMode('any');
@@ -96,20 +114,26 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
     }
     setPaletteId('custom');
     setDownloadError(null);
+    trackMakeEvent('palette_selected', { design: design.id, palette: 'custom' });
   };
   const selectCustomMode = (next: 'any' | 'filament') => {
     if (next === customMode) return;
-    if (next === 'filament') setFilaments(matchFilaments(manualPalette.swatches!, range));
+    if (next === 'filament') {
+      setFilaments(matchFilaments(manualPalette.swatches!, range));
+      trackMakeEvent('filament_brand_selected', { design: design.id, brand: brand.id, range: range.id });
+    }
     else setManualPalette(customTriplet(filamentPalette, design.slotRoleIndex));
     setCustomMode(next);
     setDownloadError(null);
   };
   const changeManualColour = (slot: TripletSlot, hex: string) => setManualPalette((current) => withTripletColor(current, slot, hex, design.slotRoleIndex));
   const changeBrand = (next: FilamentBrand) => {
+    if (next.id === brand.id) return;
     const nextRange = next.ranges.find(({ id }) => id === next.defaultRangeId) ?? next.ranges[0];
     setFilaments(matchFilaments(filaments.map(({ hex }) => hex), nextRange));
     setBrand(next);
     setRange(nextRange);
+    trackMakeEvent('filament_brand_selected', { design: design.id, brand: next.id, range: nextRange.id });
   };
   const changeRange = (next: FilamentRange) => {
     setFilaments(matchFilaments(filaments.map(({ hex }) => hex), next));
@@ -117,26 +141,36 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
   };
   const changeFilament = (slot: 0 | 1 | 2, filament: Filament) => setFilaments((current) => current.map((item, index) => index === slot ? filament : item) as FilamentTriplet);
   const download3mf = async () => {
-    setDownloadBusy(true);
+    setDownloadBusy('3mf');
     setDownloadError(null);
     try {
       const response = await fetch(assetUrl(`${stem}.3mf`));
       if (!response.ok) throw new Error('The 3MF template could not be loaded.');
       const { recolour3mf } = await import('./recolour3mf');
       const bytes = recolour3mf(new Uint8Array(await response.arrayBuffer()), catalog.palettes[design.templatePaletteId], customPalette, customMode === 'filament' ? { brand: brand.name, range: range.name, filaments } : undefined);
-      const url = URL.createObjectURL(new Blob([new Uint8Array(bytes)], { type: 'model/3mf' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = customMode === 'filament' ? `${design.id}-${brand.id}-${range.id}.3mf` : `${design.id}-custom.3mf`;
-      document.body.append(link);
-      link.click();
-      trackFileDownload(link.download);
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      startBrowserDownload(new Blob([new Uint8Array(bytes)], { type: 'model/3mf' }), customMode === 'filament' ? `${design.id}-${brand.id}-${range.id}.3mf` : `${design.id}-custom.3mf`);
+      recordDownload('3mf');
     } catch (reason) {
       setDownloadError(reason instanceof Error ? reason.message : 'The 3MF could not be prepared.');
     } finally {
-      setDownloadBusy(false);
+      setDownloadBusy(null);
+    }
+  };
+  const downloadStatic = async (format: '3mf' | 'stl') => {
+    const fileName = format === '3mf' ? `${stem}.3mf` : `${design.id}.stl`;
+    setDownloadBusy(format);
+    setDownloadError(null);
+    try {
+      const response = await fetch(assetUrl(fileName));
+      if (!response.ok) throw new Error(`The ${format.toUpperCase()} file could not be loaded.`);
+      const blob = await response.blob();
+      if (!blob.size) throw new Error(`The ${format.toUpperCase()} file is empty.`);
+      startBrowserDownload(blob, fileName);
+      recordDownload(format);
+    } catch (reason) {
+      setDownloadError(reason instanceof Error ? reason.message : `The ${format.toUpperCase()} file could not be downloaded.`);
+    } finally {
+      setDownloadBusy(null);
     }
   };
   return (
@@ -191,10 +225,10 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
           <div className="panel-heading"><h3>4. Download</h3></div>
           <div className="file-summary"><strong>{design.title}</strong><span>{isCustom ? (customMode === 'filament' ? `${brand.name} · ${range.name}` : 'Custom colours') : `${palette.name} palette`}</span><Swatches palette={palette} /></div>
           {isCustom
-            ? <button className="button button-primary download-button" type="button" disabled={downloadBusy} onClick={download3mf}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy ? 'Preparing 3MF…' : 'Download 3MF'}<small>{customMode === 'filament' ? 'Colours and names saved in file' : 'Three custom colour regions'}</small></span></button>
-            : <a className="button button-primary download-button" href={assetUrl(`${stem}.3mf`)} download={`${stem}.3mf`} onClick={() => trackFileDownload(`${stem}.3mf`)}><span className="download-arrow" aria-hidden="true">↓</span><span>Download 3MF<small>Colour regions for filament mapping</small></span></a>}
+            ? <button className="button button-primary download-button" type="button" disabled={downloadBusy !== null} onClick={download3mf}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy === '3mf' ? 'Preparing 3MF…' : 'Download 3MF'}<small>{customMode === 'filament' ? 'Colours and names saved in file' : 'Three custom colour regions'}</small></span></button>
+            : <button className="button button-primary download-button" type="button" disabled={downloadBusy !== null} onClick={() => void downloadStatic('3mf')}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy === '3mf' ? 'Preparing 3MF…' : 'Download 3MF'}<small>Colour regions for filament mapping</small></span></button>}
           {downloadError && <p className="download-error" role="alert">{downloadError}</p>}
-          <a className="button button-outline download-button" href={assetUrl(`${design.id}.stl`)} download={`${design.id}.stl`} onClick={() => trackFileDownload(`${design.id}.stl`)}><span className="download-arrow" aria-hidden="true">↓</span><span>Download STL<small>Single-colour solid</small></span></a>
+          <button className="button button-outline download-button" type="button" disabled={downloadBusy !== null} onClick={() => void downloadStatic('stl')}><span className="download-arrow" aria-hidden="true">↓</span><span>{downloadBusy === 'stl' ? 'Preparing STL…' : 'Download STL'}<small>Single-colour solid</small></span></button>
           <button className="print-info-trigger" type="button" aria-haspopup="dialog" aria-controls="print-info" onClick={() => printDialogRef.current?.showModal()}>
             <span className="info-mark" aria-hidden="true">i</span><span className="print-info-label">Before printing</span>
           </button>
