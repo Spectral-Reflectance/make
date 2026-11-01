@@ -1,11 +1,11 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import { FacePreview } from './FacePreview';
-import { FilamentSelector } from './FilamentSelector';
 import { ManualColourSelector } from './ManualColourSelector';
 import { filamentBrands, matchFilaments, paletteForFilaments, type Filament, type FilamentTriplet, type FilamentBrand, type FilamentRange } from './filamentPicker';
 import { assetStem, assetUrl, customTriplet, paletteEntries, withTripletColor, type Catalog, type DesignInfo, type Palette, type TripletSlot } from './data';
 
 const ModelPreview = lazy(async () => ({ default: (await import('./ModelPreview')).ModelPreview }));
+const FilamentSelector = lazy(async () => ({ default: (await import('./FilamentSelector')).FilamentSelector }));
 
 class PreviewErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -166,7 +166,7 @@ function Maker({ catalog, designId, setDesignId }: { catalog: Catalog; designId:
               </div>
               {customMode === 'any'
                 ? <ManualColourSelector palette={manualPalette} onChange={changeManualColour} />
-                : <FilamentSelector brand={brand} range={range} filaments={filaments} onBrandChange={changeBrand} onRangeChange={changeRange} onFilamentChange={changeFilament} />}
+                : <Suspense fallback={<p className="panel-note" role="status">Loading filament choices…</p>}><FilamentSelector brand={brand} range={range} filaments={filaments} onBrandChange={changeBrand} onRangeChange={changeRange} onFilamentChange={changeFilament} /></Suspense>}
             </div>}
             <p className="panel-note">Colours are approximate. Check your filaments in the slicer before printing.</p>
           </div>

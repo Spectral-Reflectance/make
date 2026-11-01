@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { filamentBrands, type Filament, type FilamentBrand, type FilamentRange, type FilamentTriplet } from './filamentPicker';
+import { StyledSelect } from './StyledSelect';
 
 interface Props {
   brand: FilamentBrand;
@@ -16,14 +17,14 @@ export function FilamentSelector({ brand, range, filaments, onBrandChange, onRan
   const visible = range.colours.filter(({ name }) => name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   return <div className="filament-selector">
     <div className="filament-selects">
-      <label>Brand<select value={brand.id} onChange={(event) => {
-        const next = filamentBrands.find(({ id }) => id === event.target.value);
+      <StyledSelect label="Brand" value={brand.id} options={filamentBrands.map(({ id, name }) => ({ value: id, label: name }))} onChange={(id) => {
+        const next = filamentBrands.find((item) => item.id === id);
         if (next) { onBrandChange(next); setQuery(''); }
-      }}>{filamentBrands.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-      <label>PLA range<select value={range.id} onChange={(event) => {
-        const next = brand.ranges.find(({ id }) => id === event.target.value);
+      }} />
+      <StyledSelect label="PLA range" value={range.id} options={brand.ranges.map(({ id, name }) => ({ value: id, label: name }))} onChange={(id) => {
+        const next = brand.ranges.find((item) => item.id === id);
         if (next) { onRangeChange(next); setQuery(''); }
-      }}>{brand.ranges.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+      }} />
     </div>
     <p className="filament-instruction">Your three filaments <span>Click a slot to change it</span></p>
     <div className="filament-slots" role="group" aria-label="Selected filaments">
