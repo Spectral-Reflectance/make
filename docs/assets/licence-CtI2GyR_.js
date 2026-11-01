@@ -1,0 +1,1 @@
+import{a as l,c as r,t as i}from"./styles-CHGBIvMT.js";const e=document.querySelector("[data-theme-toggle]");if(e){const a=()=>{const t=r();e.setAttribute("aria-label",i(t)),e.setAttribute("title",i(t)),e.setAttribute("aria-pressed",String(t==="dark"))};a(),e.addEventListener("click",()=>{l(r()==="light"?"dark":"light"),a()})}

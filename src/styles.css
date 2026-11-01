@@ -453,8 +453,8 @@ h1,h2,h3 {
   border-bottom-color:#860c2d
 }
 .preview-window {
-  flex:1 1 0;
-  min-height:560px;
+  flex:none;
+  height:560px;
   background:#f5f3f0;
   border-radius:6px;
   margin-top:12px;
