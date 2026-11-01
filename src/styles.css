@@ -322,6 +322,7 @@ h1,h2,h3 {
   line-height:1.5
 }
 .filament-selector {display:grid;gap:12px}
+.filament-custom-panel {margin-top:12px;padding:12px 10px;border:1px solid #e1e3e6;border-radius:7px;background:#fbfbfa}
 .filament-selects {display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .filament-selects label,.filament-search {display:grid;gap:5px;color:#34435d;font-size:11px;font-weight:700}
 .filament-selects select,.filament-search input {width:100%;min-width:0;height:36px;border:1px solid #d9dce2;border-radius:6px;background:#fff;color:#0d1d3b;padding:0 9px;font:inherit;font-size:12px}
@@ -342,9 +343,6 @@ h1,h2,h3 {
 .filament-colour i {width:22px;height:22px}
 .filament-colour span {overflow-wrap:anywhere}
 .filament-empty {grid-column:1/-1;color:#69758c;font-size:11px}
-.filament-source {display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 8px;margin:0;font-size:10px;line-height:1.4}
-.filament-source a {color:#8a0b2c}
-.filament-source span {color:#8b93a1}
 .palette-options {
   display:grid;
   gap:8px

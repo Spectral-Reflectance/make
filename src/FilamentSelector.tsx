@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { catalogueReviewed, filamentBrands, type Filament, type FilamentBrand, type FilamentRange, type FilamentTriplet } from './filamentPicker';
+import { filamentBrands, type Filament, type FilamentBrand, type FilamentRange, type FilamentTriplet } from './filamentPicker';
 
 interface Props {
   brand: FilamentBrand;
@@ -39,6 +39,5 @@ export function FilamentSelector({ brand, range, filaments, onBrandChange, onRan
       </button>)}
       {visible.length === 0 && <p className="filament-empty">No colours match “{query}”.</p>}
     </div>
-    <p className="filament-source"><a href={range.sourceUrl} target="_blank" rel="noopener noreferrer">View {brand.name} colour source ↗</a><span>Catalogue checked {catalogueReviewed}</span></p>
   </div>;
 }
