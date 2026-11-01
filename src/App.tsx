@@ -85,7 +85,13 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
   const palette = isCustom ? customPalette : catalog.palettes[selectedPaletteId];
   const stem = assetStem(design.id, isCustom ? design.templatePaletteId : selectedPaletteId);
   const downloadPalette = isCustom ? 'custom' : selectedPaletteId;
-  const recordDownload = (format: '3mf' | 'stl') => trackMakeEvent('model_download', { design: design.id, format, palette: downloadPalette });
+  const recordDownload = (format: '3mf' | 'stl') => trackMakeEvent('model_download', {
+    design_id: design.id,
+    file_format: format,
+    palette_id: downloadPalette,
+    palette_type: isCustom ? 'custom' : 'preset',
+    filament_brand: isCustom && customMode === 'filament' ? brand.id : 'not_selected',
+  });
   const selectDesign = (next: DesignInfo) => {
     if (next.id === design.id) return;
     setDesignId(next.id);
@@ -93,7 +99,7 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
     setCustomMode('any');
     setManualPalette(customTriplet(catalog.palettes[next.paletteIds[0]], next.slotRoleIndex));
     setFilaments(matchFilaments(catalog.palettes[next.paletteIds[0]].filaments!.map(({ hex }) => hex), range));
-    trackMakeEvent('design_selected', { design: next.id });
+    trackMakeEvent('design_selected', { design_id: next.id });
   };
   const selectPreset = (id: string, preset: Palette) => {
     if (id === paletteId) return;
@@ -102,7 +108,7 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
     setManualPalette(customTriplet(preset, design.slotRoleIndex));
     setFilaments(matchFilaments(preset.filaments!.map(({ hex }) => hex), range));
     setDownloadError(null);
-    trackMakeEvent('palette_selected', { design: design.id, palette: id });
+    trackMakeEvent('palette_selected', { design_id: design.id, palette_id: id, palette_type: 'preset' });
   };
   const selectCustom = () => {
     if (isCustom) return;
@@ -114,13 +120,13 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
     }
     setPaletteId('custom');
     setDownloadError(null);
-    trackMakeEvent('palette_selected', { design: design.id, palette: 'custom' });
+    trackMakeEvent('palette_selected', { design_id: design.id, palette_id: 'custom', palette_type: 'custom' });
   };
   const selectCustomMode = (next: 'any' | 'filament') => {
     if (next === customMode) return;
     if (next === 'filament') {
       setFilaments(matchFilaments(manualPalette.swatches!, range));
-      trackMakeEvent('filament_brand_selected', { design: design.id, brand: brand.id, range: range.id });
+      trackMakeEvent('filament_brand_selected', { filament_brand: brand.id, pla_range: range.id });
     }
     else setManualPalette(customTriplet(filamentPalette, design.slotRoleIndex));
     setCustomMode(next);
@@ -133,11 +139,13 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
     setFilaments(matchFilaments(filaments.map(({ hex }) => hex), nextRange));
     setBrand(next);
     setRange(nextRange);
-    trackMakeEvent('filament_brand_selected', { design: design.id, brand: next.id, range: nextRange.id });
+    trackMakeEvent('filament_brand_selected', { filament_brand: next.id, pla_range: nextRange.id });
   };
   const changeRange = (next: FilamentRange) => {
+    if (next.id === range.id) return;
     setFilaments(matchFilaments(filaments.map(({ hex }) => hex), next));
     setRange(next);
+    trackMakeEvent('filament_brand_selected', { filament_brand: brand.id, pla_range: next.id });
   };
   const changeFilament = (slot: 0 | 1 | 2, filament: Filament) => setFilaments((current) => current.map((item, index) => index === slot ? filament : item) as FilamentTriplet);
   const download3mf = async () => {
@@ -148,6 +156,7 @@ function Maker({ catalog, designId, setDesignId, theme }: { catalog: Catalog; de
       if (!response.ok) throw new Error('The 3MF template could not be loaded.');
       const { recolour3mf } = await import('./recolour3mf');
       const bytes = recolour3mf(new Uint8Array(await response.arrayBuffer()), catalog.palettes[design.templatePaletteId], customPalette, customMode === 'filament' ? { brand: brand.name, range: range.name, filaments } : undefined);
+      if (!bytes.length) throw new Error('The 3MF file is empty.');
       startBrowserDownload(new Blob([new Uint8Array(bytes)], { type: 'model/3mf' }), customMode === 'filament' ? `${design.id}-${brand.id}-${range.id}.3mf` : `${design.id}-custom.3mf`);
       recordDownload('3mf');
     } catch (reason) {

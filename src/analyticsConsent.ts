@@ -73,9 +73,20 @@ function startAnalytics(): void {
   document.head.append(script);
 }
 
-export type MakeEventName = 'design_selected' | 'palette_selected' | 'model_download' | 'filament_brand_selected';
+export type MakeEventParameters = {
+  design_selected: { design_id: string };
+  palette_selected: { design_id: string; palette_id: string; palette_type: 'preset' | 'custom' };
+  filament_brand_selected: { filament_brand: string; pla_range: string };
+  model_download: {
+    design_id: string;
+    file_format: '3mf' | 'stl';
+    palette_id: string;
+    palette_type: 'preset' | 'custom';
+    filament_brand: string;
+  };
+};
 
-export function trackMakeEvent(name: MakeEventName, parameters: Record<string, string>): void {
+export function trackMakeEvent<Name extends keyof MakeEventParameters>(name: Name, parameters: MakeEventParameters[Name]): void {
   if (!analyticsAllowed) return;
   const gtag = analyticsGlobals().gtag;
   if (typeof gtag === 'function') gtag('event', name, parameters);
